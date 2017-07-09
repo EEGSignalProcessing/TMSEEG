@@ -30,5 +30,10 @@ MAINTAINER
 --------------
 
 Current Maintainers: 
-    * Matthew Frehlich 
-    * Sravye Atluri
+* Matthew Frehlichx 
+* Sravye Atluri
+
+REPOSITORY WORKFLOW
+--------------
+
+We follow the GitHub workflow guidelines summarized by [Ben Sandofsky](https://sandofsky.com/blog/git-workflow.html). Please contact @cogsmac about significant changes you intend to make to local branches. 
