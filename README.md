@@ -37,3 +37,12 @@ REPOSITORY WORKFLOW
 --------------
 
 We follow the GitHub workflow guidelines summarized by [Ben Sandofsky](https://sandofsky.com/blog/git-workflow.html). Please contact @cogsmac about significant changes you intend to make to local branches. 
+
+
+GETTING STARTED
+--------------
+
+Visit the wiki page for links to sample data sets and the offical tutorial. A couple main things to keep in mind  
+
+1) TMSEEG toolbox requires EEGLAB to be installed
+2) MATLAB is picky about paths. After download, pay attention to how the paths are set as indicated by the tutorial and documentation. If you receive an error that a file is missing it is probably because either the dependencies are not installed or because the paths are not set correctly
