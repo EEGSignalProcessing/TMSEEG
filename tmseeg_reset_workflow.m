@@ -9,10 +9,10 @@ checkext = '';
 for i = 1:tostep
 
     checkext = [checkext '_' num2str(i)];
-    if (i >= fromstep) %&& exist([basepath '/' basefile checkext ext],'file')
-            strevaldel = ['delete ' ,'''',[basepath '/' basefile checkext ext],''''];
-            strevaldel1 = ['delete(','''',[basepath '/*' checkext '_toDelete.mat'],'''',')'];
-            strevaldel2 = ['delete(','''',[basepath '/*' checkext '_ICA2comp.mat'],'''',')'];
+    if (i >= fromstep) %&& exist([basepath '\' basefile checkext ext],'file') 
+            strevaldel = ['delete ' ,'''',[basepath '\' basefile checkext ext],''''];
+            strevaldel1 = ['delete(','''',[basepath '\*' checkext '_toDelete.mat'],'''',')'];
+            strevaldel2 = ['delete(','''',[basepath '\*' checkext '_ICA2comp.mat'],'''',')'];
             evalc(strevaldel);
             evalc(strevaldel1);
             evalc(strevaldel2);

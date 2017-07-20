@@ -206,8 +206,8 @@ del_pair = [S.trial  S.ch];
 if ~isempty(S.toDelete) && (any(ismember(S.toDelete,del_pair,'rows')))  %Undelete Trial
 
     S.toDelete = S.toDelete(~ismember(S.toDelete,del_pair,'rows'),:);
-    p   = flipud(findobj(S.sp(S.ch),'type','patch'));
-    set(p(S.trial),'MarkerEdgeColor',[0 0 0])
+    p   = flipud(findobj(S.sp(S.ch),'type','scatter'));
+    set(p(S.trial),'CData',[0 0 0])
     if get(findobj('tag','visible'),'value')
         set(lines(trial),'Color','default','LineWidth',1);
     else
@@ -215,8 +215,8 @@ if ~isempty(S.toDelete) && (any(ismember(S.toDelete,del_pair,'rows')))  %Undelet
     end
 else
     S.toDelete = cat(1,S.toDelete, del_pair);
-    p   = flipud(findobj(S.sp(S.ch),'type','patch'));
-    set(p(S.trial),'MarkerEdgeColor',dotcolor)
+    p   = flipud(findobj(S.sp(S.ch),'type','scatter'));
+    set(p(S.trial),'CData',dotcolor)
 
     if get(findobj('tag','visible'),'value')
         set(lines(trial),'Color',linecolor,'LineWidth',1);

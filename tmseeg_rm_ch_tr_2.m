@@ -144,18 +144,19 @@ S.ft = figure('position',[40 80 800 500],'color',backcolor);
 N = size(S.M,2);
 
 %Scatter Plot
-if N>100
-    warning('off','MATLAB:usev6plotapi:DeprecatedV6ArgumentForFilename')
-    scatter('v6',1:N,mean(S.M),'ko','filled');
-else
-    scatter(1:N,mean(S.M),'ko','filled');
-end
-points   = flipud(findobj(get(gca,'Children'),'type','patch'));
+% if N>100
+%     warning('off','MATLAB:usev6plotapi:DeprecatedV6ArgumentForFilename')
+%     scatter('v6',1:N,mean(S.M),'ko','filled');
+% else
+%     scatter(1:N,mean(S.M),'ko','filled');
+% end
+PlotScatter16(S);
+points   = flipud(findobj(get(gca,'Children'),'type','scatter'));
 set(gca,'NextPlot','add');
 if ~isempty(S.toDelete)
     Del   = S.toDelete;
     Del   = Del(ismember(Del(:,2),0),:);
-    set(points(Del(:,1)),'MarkerFaceColor',dotcolor)   
+    set(points(Del(:,1)),'CData',dotcolor)   
 end
 
 guidata(S.fh,S);
@@ -213,14 +214,16 @@ N = size(S.M,2);
 for k = 1:S.EEG.nbchan
     if N>100
         warning('off','MATLAB:usev6plotapi:DeprecatedV6ArgumentForFilename')
-        scatter('v6',S.sp(k),1:N,S.M(k,:),'k.');
+%         scatter('v6',S.sp(k),1:N,S.M(k,:),'k.');
+        PlotScatterChan16(S,k);
     else
-        scatter(S.sp(k),1:N,S.M(k,:),'k.');
+%         scatter(S.sp(k),1:N,S.M(k,:),'k.');
+        PlotScatterChan16(S,k);
         title(S.sp(k),label_list{k})
     end
     set(S.sp(k),'XLim',[-0.1*N N+N*0.1;],'NextPlot','add');
 end
-set(findobj('type','patch'),'Hittest','on')
+set(findobj('type','scatter'),'Hittest','on')
 set(S.sp,'XTickLabel',{' '},'YTickLabel',{' '})
 
 % Setting Deleted elements to red dots
@@ -231,8 +234,8 @@ if ~isempty(S.toDelete)
     badtr  = ismember(Del(:,2),0);
     for k  = setdiff(1:S.EEG.nbchan,Del(badch,2))
         bt4ch = [Del(ismember(Del(:,2),k),1); Del(badtr,1)]; 
-        p     = flipud(findobj(get(S.sp(k),'Children'),'type','patch'));
-        set(p(bt4ch),'MarkerEdgeColor',dotcolor)
+        p     = flipud(findobj(get(S.sp(k),'Children'),'type','scatter'));
+        set(p(bt4ch),'CData',dotcolor)
     end
 end
 
@@ -312,7 +315,7 @@ figure('menubar','none','Toolbar','none','Color',backcolor);
 imagesc(image);
 xlabel('Trial')
 ylabel('Channel')
-title('Deletion Matrix (Red = marked for deletion)')
+title('Deletion Matrix (Yellow = marked for deletion)')
 end
 
 %Clear Deletion Matrix
@@ -339,8 +342,8 @@ S       = guidata(S.fh);
 A        = varargin{4};
 [files, EEG] = tmseeg_load_step(S.step_num);
 try
-    disp(exist([basepath '/' S.name '_' num2str(S.step_num) '_toDelete.mat']))
-    if exist([basepath '/' S.name '_' num2str(S.step_num) '_toDelete.mat'])
+    disp(exist([basepath '\' S.name '_' num2str(S.step_num) '_toDelete.mat']))
+    if exist([basepath '\' S.name '_' num2str(S.step_num) '_toDelete.mat'])
         load(fullfile(basepath,[S.name '_' num2str(S.step_num) '_toDelete.mat']));
     else
         toDelete = [];
@@ -360,19 +363,59 @@ end
 
 %------------------------------Helper Functions----------------------------
 
+%Matlab 2016 Compatible Scatter Plot - Trial Display
+function PlotScatter16(varargin)
+S       = varargin{1};
+S       = guidata(S.fh);
+N = size(S.M,2);
+sc = [];
+sm = mean(S.M);
+if N>100
+    warning('off','MATLAB:usev6plotapi:DeprecatedV6ArgumentForFilename')
+    for i = 1:N
+        sc = [sc scatter('v6',i,sm(i),'ko','filled')]; hold on;
+    end
+else
+    for i = 1:N
+        sc = [sc scatter(i,sm(i),'ko','filled')]; hold on;
+    end
+end
+
+end
+
+%Matlab 2016 Compatible Scatter Plot - Channel Display
+function PlotScatterChan16(varargin)
+S       = varargin{1};
+k       = varargin{2};
+S       = guidata(S.fh);
+N = size(S.M,2);
+sc = [];
+if N>100
+    warning('off','MATLAB:usev6plotapi:DeprecatedV6ArgumentForFilename')
+    for i = 1:N
+        sc = [sc scatter('v6',S.sp(k),i,S.M(k,i),'ko','filled')]; hold on;
+    end
+else
+    for i = 1:N
+        sc = [sc scatter(S.sp(k),i,S.M(k,i),'ko','filled')]; hold on;
+    end
+end
+
+end
+
 %Select Window Callback
 function ClickOnWindow(varargin)
 global points trial
 S       = varargin{3};
 S       = guidata(S.fh);
-if isequal(get(gco,'type'),'patch')
-    points   = flipud(findobj(get(gca,'Children'),'type','patch'));
+if isequal(get(gco,'type'),'scatter')
+    points   = flipud(findobj(get(gca,'Children'),'type','scatter'));
     trial    = find(ismember(points,gco));
     S.trial  = trial;
     guidata(S.fh,S);
     tmseeg_plot_Trial(S);
 elseif isequal(get(gco,'type'),'axes')
-    points   = flipud(findobj(get(gca,'Children'),'type','patch'));
+    points   = flipud(findobj(get(gca,'Children'),'type','scatter'));
     S.ch = find(ismember(S.sp,gco));
     guidata(S.fh,S);
     tmseeg_plot_channel2(S);

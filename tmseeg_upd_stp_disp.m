@@ -7,7 +7,7 @@ global existcolor notexistcolor basepath basefile
 checkext = '';
 for i = 1:num_steps
     checkext = [checkext '_' num2str(i)];
-    if exist([basepath '/' basefile checkext ext],'file')
+    if exist([basepath '\' basefile checkext ext],'file')
             streval = ['set(S.button' num2str(i) ,' ,',...
                 '''BackgroundColor''',' ,','existcolor',');'];
             strevals = ['set(S.button' num2str(i) ,'s ,',...

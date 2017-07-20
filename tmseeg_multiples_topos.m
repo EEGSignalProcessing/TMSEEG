@@ -79,8 +79,8 @@ for k = 1:size(EEG.icawinv,2)
     if isfield(EEG,'comptype') && EEG.comptype(I(k))>0
         type = label{EEG.comptype(I(k))};
     elseif ~isfield(EEG,'comptype') && kurt(k)
-        type = 'Elect';
-        comptype(I(k))=5;
+%         type = 'Elect';
+%         comptype(I(k))=5;
     else
         type = '';
     end
@@ -307,7 +307,7 @@ imagesc(image);
 xlabel('Component Type')
 ylabel('Component #')
 set(gca,'XTickLabel',label)
-title('Component Tags (Red = marked for deletion)')
+title('Component Tags (Yellow = marked for deletion)')
 
 end
 
