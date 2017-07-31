@@ -81,6 +81,7 @@ for k = 1:size(EEG.icawinv,2)
     elseif ~isfield(EEG,'comptype') && kurt(k)
 %         type = 'Elect';
 %         comptype(I(k))=5;
+        type = '';
     else
         type = '';
     end
