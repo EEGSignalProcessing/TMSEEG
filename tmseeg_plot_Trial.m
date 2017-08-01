@@ -128,14 +128,14 @@ else % If no lines selected, check Trial Deletion Status
                 S.toDelete = S.toDelete(~ismember(S.toDelete,del_pair,'rows'),:);
                 if isfield(S, 'sp') && all(ishandle(S.sp))
                     for ch = 1:S.EEG.nbchan
-                        p   = flipud(findobj(S.sp(ch),'type','scatter'));
-                        set(p(S.trial),'CData','default')
+                        p   = flipud(findobj(S.sp(ch),'type','patch'));
+                        set(p(S.trial),'MarkerEdgeColor','default')
                     end
                 end
                 guidata(S.fh,S);
                 toDelete   = S.toDelete;
                 disp(toDelete)
-                set(points(S.trial),'CData',[0 0 0])
+                set(points(S.trial),'MarkerFaceColor',[0 0 0])
                 set(gca,'Color','default')
                 set(lines,'hittest','on');
                 set(findobj('tag','dt'),'string','Delete')
@@ -152,11 +152,11 @@ else % If no lines selected, check Trial Deletion Status
                 S.toDelete = cat(1,S.toDelete,del_pair);
                 if isfield(S, 'sp') && all(ishandle(S.sp))
                     for ch = 1:S.EEG.nbchan
-                        p   = flipud(findobj(S.sp(ch),'type','scatter'));
-                        set(p(S.trial),'CData',dotcolor)
+                        p   = flipud(findobj(S.sp(ch),'type','patch'));
+                        set(p(S.trial),'MarkerEdgeColor',dotcolor)
                     end
                 else
-                    set(points(S.trial),'CData',dotcolor)
+                    set(points(S.trial),'MarkerFaceColor',dotcolor)
                 end
                 guidata(S.fh,S);
                 toDelete   = S.toDelete;
@@ -194,8 +194,8 @@ global dotcolor
 
 for k  = setdiff(1:S.EEG.nbchan,find(ismember(cell2mat(get(S.sp,'Color')),[.5 .5 .5],'rows')))
     bt4ch = D(D(:,2)==k,1);
-    p     = flipud(findobj(get(S.sp(k),'Children'),'type','scatter'));
-    set(p(bt4ch),'CData',dotcolor)
+    p     = flipud(findobj(get(S.sp(k),'Children'),'type','patch'));
+    set(p(bt4ch),'MarkerEdgeColor',dotcolor)
 end
 
 

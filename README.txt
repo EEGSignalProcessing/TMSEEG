@@ -5,12 +5,6 @@ TMSEEG is a Matlab App designed for streamlined processing of EEG data
 collected during TMS application.  Processing steps are presented using a
 GUI format with modularity.  
 
-UPDATES
---------------------
-V3.1 - Changes made to plotting functions for compatibility with MATLAB 2016
-* V3.1 is not backward compatible past 2014 due to use of dot notation
-  for graphical objects.
-
 REQUIREMENTS
 --------------------
 TMSEEG was built on MATLAB v2013a, with use of EEGLAB v12.0.2.6b.  Both

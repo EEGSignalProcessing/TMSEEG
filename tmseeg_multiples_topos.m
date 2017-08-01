@@ -307,7 +307,7 @@ imagesc(image);
 xlabel('Component Type')
 ylabel('Component #')
 set(gca,'XTickLabel',label)
-title('Component Tags (Yellow = marked for deletion)')
+title('Component Tags (Red = marked for deletion)')
 
 end
 
