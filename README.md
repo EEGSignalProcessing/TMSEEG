@@ -30,7 +30,7 @@ MAINTAINER
 --------------
 
 Current Maintainers: 
-* Matthew Frehlichx 
+* Faranak Farzan
 * Sravya Atluri
 
 REPOSITORY WORKFLOW
