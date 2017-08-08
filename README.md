@@ -42,7 +42,7 @@ We follow the GitHub workflow guidelines summarized by [Ben Sandofsky](https://s
 GETTING STARTED
 --------------
 
-Visit the [wiki page](https://github.com/cogsmac/TMSEEG/wiki/Getting-Started) for links to [sample data sets](http://www.tmseeg.com/wp-content/uploads/2016/05/SampleData.zip) and the [offical tutorial](http://www.tmseeg.com/wp-content/uploads/2016/05/TMSEEG-Tutorial-v3.pdf). A couple main things to keep in mind  
+Visit the [wiki page](https://github.com/cogsmac/TMSEEG/wiki/Getting-Started) for links to [sample data sets](http://www.tmseeg.com/wp-content/uploads/2016/05/SampleData.zip) and the [offical tutorial](http://www.tmseeg.com/tutorials/). A couple main things to keep in mind  
 
 1) TMSEEG toolbox requires [EEGLAB](https://sccn.ucsd.edu/eeglab/downloadtoolbox.php) to be installed
 2) MATLAB is picky about [paths](http://www.mathworks.com/help/matlab/ref/path.html?s_tid=gn_loc_drop). After download, pay attention to how the paths are set as indicated by the tutorial and documentation. If you receive an error that a file is missing it is probably because either the dependencies are not installed or because the paths are not set correctly
