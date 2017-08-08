@@ -29,8 +29,7 @@ http://www.mathworks.com/videos/packaging-and-installing-matlab-apps-70404.html
 MAINTAINER
 --------------
 
-Current Maintainers: 
-* Matthew Frehlichx 
+* Faranak Farzan
 * Sravya Atluri
 
 REPOSITORY WORKFLOW
