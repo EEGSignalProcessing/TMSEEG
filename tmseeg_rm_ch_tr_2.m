@@ -45,6 +45,10 @@
 
 function  tmseeg_rm_ch_tr_2(A, step_num)
 
+if tmseeg_previous_step(step_num) %added by Ben Schwartzmann
+    return %if cant load previous steps current step is aborted
+end
+
 global basepath dotcolor linecolor backcolor VARS
 linecolor = [1 0 0];
 dotcolor  = linecolor;

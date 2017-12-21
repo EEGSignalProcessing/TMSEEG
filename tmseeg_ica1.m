@@ -17,18 +17,22 @@
 
 function [] = tmseeg_ica1(S,step_num)
 %Runs Independent Component Analysis on the dataset from the previous step
- %using EEGLab's pop_runica()
-global basepath existcolor
-    %Data Load
-    [files, EEG] = tmseeg_load_step(step_num);
-    %Run ICA, save new dataset
-    h1 = msgbox('Running ICA1,now!');
-    EEG   = pop_runica( EEG, 'icatype' ,'fastica','g','tanh','approach','symm');
-    EEG   = eeg_checkset(EEG);
-    tmseeg_step_check(files, EEG, S, step_num)
-    if ishandle(h1)
-        close(h1)
-    end
+%using EEGLab's pop_runica()
+ 
+if tmseeg_previous_step(step_num) %added by Ben Schwartzmann
+    return %if cant load previous steps current step is aborted
+end 
+ 
+%Data Load
+[files, EEG] = tmseeg_load_step(step_num);
+
+%Run ICA, save new dataset
+h1 = msgbox('Running ICA1,now!');
+EEG   = pop_runica( EEG, 'icatype' ,'fastica','g','tanh','approach','symm');
+EEG   = eeg_checkset(EEG);
+
+tmseeg_step_check(files, EEG, S, step_num)
+close(h1)
 
 end
 

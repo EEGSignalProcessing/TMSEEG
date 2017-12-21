@@ -18,6 +18,11 @@
 
 
 function [] = tmseeg_init_proc(S,step_num)
+
+if tmseeg_previous_step(step_num) %added by Ben Schwartzmann
+    return %if cant load previous steps current step is aborted
+end
+
 global basepath basefile VARS
 %     Takes the parent structure S as an input, loads and preprocesses data
 %     using the EEGLAB specific functions...

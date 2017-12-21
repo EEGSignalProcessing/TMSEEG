@@ -20,19 +20,24 @@
 function [] = tmseeg_ica2(S,step_num)
 %Runs Independent Component Analysis on the dataset from the previous step
  %using EEGLab's pop_runica()
- global VARS
-    %Data Load
-    [files, EEG] = tmseeg_load_step(step_num);
-    VARS.ICA2_COMP_NUM = ceil(EEG.nbchan*VARS.ICA_COMP_PCT/100);
-    %Run ICA2
-    h1 = msgbox('Running ICA2,now!');
-    EEG   = pop_runica( EEG, 'icatype' ,'fastica','g','tanh',...
+
+if tmseeg_previous_step(step_num) %added by Ben Schwartzmann
+    return %if cant load previous steps current step is aborted
+end
+
+global VARS
+
+%Data Load
+[files, EEG] = tmseeg_load_step(step_num);
+VARS.ICA2_COMP_NUM = ceil(EEG.nbchan*VARS.ICA_COMP_PCT/100);
+    
+%Run ICA2
+h1 = msgbox('Running ICA2,now!');
+EEG   = pop_runica( EEG, 'icatype' ,'fastica','g','tanh',...
         'approach','symm','lasteig',VARS.ICA2_COMP_NUM);
-
-    tmseeg_step_check(files, EEG, S, step_num)
-    close(h1)
-
-
+    
+tmseeg_step_check(files, EEG, S, step_num)
+close(h1)
 
 end
 

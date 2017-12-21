@@ -34,7 +34,9 @@
 
 function [] = tmseeg_rm_TMS_decay(A,step_num)
 
-
+if tmseeg_previous_step(step_num) %added by Ben Schwartzmann
+    return %if cant load previous steps current step is aborted
+end
 
 global EEG times basepath backcolor VARS xmin xmax
 xmin = -150;

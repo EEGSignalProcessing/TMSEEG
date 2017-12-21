@@ -39,6 +39,10 @@
 % GNU General Public License for more details.
 function tmseeg_filt(A,step_num)
 
+if tmseeg_previous_step(step_num) %added by Ben Schwartzmann
+    return %if cant load previous steps current step is aborted
+end
+
 global backcolor VARS
 
 %Initializing filter parameters

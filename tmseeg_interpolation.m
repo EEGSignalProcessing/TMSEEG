@@ -20,6 +20,11 @@
 % GNU General Public License for more details.
 
 function tmseeg_interpolation(S,step_num)
+
+if tmseeg_previous_step(step_num) %added by Ben Schwartzmann
+    return %if cant load previous steps current step is aborted
+end
+
 global basefile VARS basepath
 h = msgbox('Interpolating,now!');
 [files, EEG] = tmseeg_load_step(step_num);

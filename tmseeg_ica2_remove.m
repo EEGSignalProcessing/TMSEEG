@@ -19,15 +19,20 @@
 % GNU General Public License for more details.
 
 function [] = tmseeg_ica2_remove(S,step_num)
+
+if tmseeg_previous_step(step_num) %added by Ben Schwartzmann
+    return %if cant load previous steps current step is aborted
+end 
+
 global basepath
 global comptype
 
 %Load Data
 [files, EEG] = tmseeg_load_step(step_num);
-[pathstr,name,ext] = fileparts(files.name);
+[~,name,~] = fileparts(files.name);
 
 %Check for existing ICA2 removal data
-if exist(fullfile(basepath,[name '_' num2str(step_num) '_ICA2comp.mat']))
+if exist(fullfile(basepath,[name '_' num2str(step_num) '_ICA2comp.mat']),'file')
     load(fullfile(basepath,[name '_' num2str(step_num) '_ICA2comp.mat']));
     comptype = ICA2comp;
     EEG.comptype = comptype;
