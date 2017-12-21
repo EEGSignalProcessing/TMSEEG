@@ -64,13 +64,10 @@ EEGtimes =  min(EEG.times):1000/EEG.srate:max(EEG.times);
 data = data_temp(:,EEGtimes>=xshowmin & EEGtimes<=xshowmax);
 timtopo(data, EEG.chanlocs,'limits',[xshowmin xshowmax -yshowlimit yshowlimit])
 
-
 %Load EEG Data, display in custom plot allowing zoom feature
 
 figure('units','normalized',...
-        'menubar','none',...
         'numbertitle','off',...
-        'toolbar','none',...
         'name',['After Step ' num2str(afterstep)],...
         'position',[0 0 .9 .9 ]);
 
@@ -78,7 +75,6 @@ x = EEGtimes(EEGtimes>=xshowmin & EEGtimes<=xshowmax);
 y = squeeze(nanmean(data,3));
  
 plot(x,y)
-
 hfinalax  = gca;
 % xlim([-200 500]); 
 hzoom     = zoom;

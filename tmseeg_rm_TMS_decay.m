@@ -103,7 +103,7 @@ for k = 1:15
   plot(S.axSp(k),x,y,'linewidth',1) %Components
   set(S.axSp(k), 'xlim',[xmin xmax])
   axes(S.axSp(k+15))
-  topoplot(EEG.icawinv(:,I(k)), EEG.chanlocs) %Scalp maps
+  topoplot(EEG.icawinv(:,I(k)), EEG.chanlocs); %Scalp maps
 end
 ylabel(S.axSp(1),['Amplitude (' char(0181) 'V)'])
 S.component_lbl = uicontrol('style','text',...

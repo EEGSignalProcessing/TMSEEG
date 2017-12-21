@@ -36,10 +36,16 @@
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
+%
+%
+% Updated on Dec 2017 by Ben Schwartzmann 
+% Plot Channels is now faster 
+% Get_SM returns correct attribute now
+
 
 function  tmseeg_rm_ch_tr_1(A, step_num)
-clc
-global basepath basefile dotcolor linecolor backcolor existcolor VARS
+
+global basepath dotcolor linecolor backcolor VARS
 linecolor = [1 0 0];
 dotcolor  = linecolor;
 
@@ -61,9 +67,9 @@ S.ls_var =  uicontrol('style','popupmenu',...
                 'units','normalized',...
                 'position',[.5 0.9 0.4 0.05],...
                 'fontsize',12,...
-                'value', 3,...
+                'value', 2,...
                 'tag','vv',...
-                'string',{'minmax w/ TMS Residual','minmax wo/ TMS Residual','High Freq'});
+                'string',{'minmax w/ TMS residual','minmax wo/ TMS residual','High Freq'});
 S.ls_notation = uicontrol('style','text',...
                 'units','normalized',...
                 'String','Select attribute for display:',...
@@ -115,7 +121,8 @@ S.step_num = step_num;
 [~,name,~]          = fileparts(file.name); 
 S.name              = name;
 
-if ~exist(fullfile(basepath,[name '_' num2str(S.step_num) '_toDelete.mat']))
+
+if ~exist(fullfile(basepath,[name '_' num2str(S.step_num) '_toDelete.mat']),'file')
     S.toDelete = [];
 else
     load(fullfile(basepath,[name '_' num2str(S.step_num) '_toDelete.mat']));
@@ -141,7 +148,7 @@ function [] = pb_tr_call(varargin)
 %Load the EEG data from previous step, extract selected ATTRIBUTE using the
 %Get_SM() function.  Displays Trials based on their ATTRIBUTE value.
 
-global points dotcolor basepath backcolor
+global dotcolor basepath backcolor colorsDot
 
 %Data Load
 S       = varargin{3};
@@ -155,15 +162,17 @@ guidata(S.fh,S);
 %Figure Setup
 S.ft = figure('position',[40 80 800 500],'color', backcolor);
 N = size(S.M,2);
+colorsDot = repmat([0 0 0],N,1);
 
 %Scatter Plot
-PlotScatter16(S);
+scatter(1:N,mean(S.M),100,'ko','filled')
 points   = flipud(findobj(get(gca,'Children'),'type','scatter'));
 set(gca,'NextPlot','add');
 if ~isempty(S.toDelete)
     Del   = S.toDelete;
     Del   = Del(ismember(Del(:,2),0),:);
-    set(points(Del(:,1)),'CData',dotcolor)   
+    colorsDot(Del(:,1),:)=repmat(dotcolor,size(Del(:,1),1),1);
+    set(points,'CData',colorsDot);
 end
 
 %Set display
@@ -182,7 +191,7 @@ function [] = pb_ch_call(varargin)
 %Get_SM() function.  Creates a scatter plot for each channel and plot the
 %Trials within that channel based on their ATTRIBUTE value.
 
-global dotcolor basepath backcolor VARS
+global dotcolor basepath backcolor VARS colorsDot
 
 %Data Load and initialization
 S       = varargin{3};
@@ -214,15 +223,15 @@ end
          
 guidata(S.fh,S);
 N = size(S.M,2);
+colorsDot = repmat([0 0 0],N,1,S.EEG.nbchan);
 
 %Scatter plots
 for k = 1:S.EEG.nbchan %find(S.chan)
     if N>100
         warning('off','MATLAB:usev6plotapi:DeprecatedV6ArgumentForFilename')
-        PlotScatterChan16(S,k);
+        scatter(S.sp(k),1:N,S.M(k,:),'ko');
     else
-%         scatter(S.sp(k),1:N,S.M(k,:),'k.');
-        PlotScatterChan16(S,k);
+        scatter(S.sp(k),1:N,S.M(k,:),30,colorsDot(:,:,k),'o','filled')
         title(S.sp(k),label_list{k});
     end
     set(S.sp(k),'XLim',[-0.1*N N+N*0.1;],'NextPlot','add');
@@ -237,9 +246,10 @@ if ~isempty(S.toDelete)
     set(S.sp(Del(badch,2)),'Color',[0.5 0.5 0.5]);
     badtr  = ismember(Del(:,2),0);
     for k  = setdiff(1:S.EEG.nbchan,Del(badch,2))
-        bt4ch = [Del(ismember(Del(:,2),k),1); Del(badtr,1)]; 
+        bt4ch = [Del(ismember(Del(:,2),k),1); Del(badtr,1)];
         p     = flipud(findobj(get(S.sp(k),'Children'),'type','scatter'));
-        set(p(bt4ch),'CData',dotcolor)
+    colorsDot(bt4ch,:,k)=repmat(dotcolor,size(bt4ch(:,1),1),1);
+    set(p,'CData',colorsDot(:,:,k));
     end
 end
 
@@ -263,7 +273,7 @@ guidata(S.fh,S);
 S.x         = linspace(0.1,1.9,S.EEG.trials);
 evalin('base', 'global TMPREJ');
 [~,IX] = sort(mean(S.M),'descend'); %Sort by attribute!!!!!
-%data = S.EEG.data(:,:,IX); 
+% data = S.EEG.data(:,:,IX); 
 data = S.EEG.data;
 eegplot(data,'spacing',100,'srate',S.EEG.srate,'limits',S.EEG.times([1 end]),...
     'winlength',5,'command','eegplot2trial');%,'teastmoneyrue''winrej',[tspan color ~S.toDelete{S.sub}']
@@ -271,12 +281,12 @@ waitfor(gcf)
 
 %If Trials were set for deletion, execute
 if ~isempty(TMPREJ)
-    [trialrej ~] = eegplot2trial( TMPREJ, size(S.EEG.data,2), size(S.EEG.data,3));  %#ok<NASGU>
+    [trialrej ~] = eegplot2trial( TMPREJ, size(S.EEG.data,2), size(S.EEG.data,3));  %#ok
     caca         = find(trialrej);
     disp(caca)
     N            = numel(caca);
     S.toDelete   = uint16(cat(1,S.toDelete, [caca(:) zeros(N,1)]));
-    toDelete     = S.toDelete;
+    toDelete     = S.toDelete; %#ok
     save(fullfile(basepath,[S.name '_' num2str(S.step_num) '_toDelete.mat']), 'toDelete');
     guidata(S.fh,S);
 end
@@ -293,9 +303,10 @@ S = guidata(varargin{1});
 [~,name,~] = fileparts(files.name); 
 
 toDelete=[];
-if exist(fullfile(basepath,[name '_' num2str(S.step_num) '_toDelete.mat']))
+if exist(fullfile(basepath,[name '_' num2str(S.step_num) '_toDelete.mat']),'file')
         load(fullfile(basepath,[name '_' num2str(S.step_num) '_toDelete.mat']));
 end
+
 
 % Create Image of Deletion Matrix
 image=zeros(EEG.nbchan,EEG.trials);
@@ -333,7 +344,7 @@ S        = guidata(S.fh);
         if isequal(button,'Yes')
            S.toDelete = [];
            guidata(S.fh,S);
-           toDelete        = S.toDelete;
+           toDelete        = S.toDelete; %#ok
            save(fullfile(basepath,[S.name '_' num2str(S.step_num) '_toDelete.mat']), 'toDelete');
         end
     end
@@ -352,8 +363,7 @@ A        = varargin{4};
 EEG.nbchan_o = EEG.nbchan;
 EEG.trials_o = EEG.trials;
 try
-    disp(exist([basepath '\' S.name '_' num2str(S.step_num) '_toDelete.mat']))
-    if exist([basepath '\' S.name '_' num2str(S.step_num) '_toDelete.mat'])
+    if exist([basepath '\' S.name '_' num2str(S.step_num) '_toDelete.mat'],'file')
         load(fullfile(basepath,[S.name '_' num2str(S.step_num) '_toDelete.mat']));
     else
         toDelete = [];
@@ -374,88 +384,75 @@ end
 
 %------------------------------Helper Functions----------------------------
 
-%Matlab 2016 Compatible Scatter Plot - Trial Display
-function PlotScatter16(varargin)
-S       = varargin{1};
-S       = guidata(S.fh);
-N = size(S.M,2);
-sc = [];
-sm = mean(S.M);
-if N>100
-    warning('off','MATLAB:usev6plotapi:DeprecatedV6ArgumentForFilename')
-    for i = 1:N
-        sc = [sc scatter('v6',i,sm(i),'ko','filled')]; hold on;
-    end
-else
-    for i = 1:N
-        sc = [sc scatter(i,sm(i),'ko','filled')]; hold on;
-    end
-end
-
-end
-
-%Matlab 2016 Compatible Scatter Plot - Channel Display
-function PlotScatterChan16(varargin)
-S       = varargin{1};
-k       = varargin{2};
-S       = guidata(S.fh);
-N = size(S.M,2);
-sc = [];
-if N>100
-    warning('off','MATLAB:usev6plotapi:DeprecatedV6ArgumentForFilename')
-    for i = 1:N
-        sc = [sc scatter('v6',S.sp(k),i,S.M(k,i),'ko','filled')]; hold on;
-    end
-else
-    for i = 1:N
-        sc = [sc scatter(S.sp(k),i,S.M(k,i),'ko','filled')]; hold on;
-    end
-end
-
-end
 
 %Select Window Callback
 function ClickOnWindow(varargin)
-global points trial
+global points backcolor dotcolor colorsDot
 % Called by Plot Channels GUI when window is selected
 S       = varargin{3};
 S       = guidata(S.fh);
-disp(get(gco,'type'))
-if isequal(get(gco,'type'),'scatter') %User selects a dot
+disp(get(gco,'type'));
+S.ch = find(ismember(S.sp,gca));
+
+if isequal(get(gco,'type'),'scatter')
+    %User selects a dot
+    %Figure Setup
+    S.ft = figure('position',[40 80 800 500],'color', backcolor);
+    N = size(S.M,2);
+    scatter(1:N,S.M(S.ch,:),'ko','filled')
     points   = flipud(findobj(get(gca,'Children'),'type','scatter'));
-    trial    = find(ismember(points,gco));
-    S.trial  = trial;
+    set(gca,'NextPlot','add');
+    label_list = {S.EEG.chanlocs.labels};
+    
+    if ~isempty(S.toDelete)
+        Del   = S.toDelete;
+        Del   = Del(ismember(Del(:,2),0),:);
+        colorsDot(Del(:,1),:,S.ch)=repmat(dotcolor,size(Del(:,1),1),1);
+        set(points,'CData',colorsDot(:,:,S.ch));
+    end
+    
+    %Set display
+    set(points, 'HitTest','on','ButtonDownFcn', {@button_down_points,S})
+    title(['Trials represented by selected attribute in channel ' label_list{S.ch}])
+    xlabel('Trial Number')
+    attr = get(findobj('tag','vv'),'value');
+    lst  = get(findobj('tag','vv'),'string');
+    ylabel(lst(attr))
     guidata(S.fh,S);
-    tmseeg_plot_Trial(S);
-elseif isequal(get(gco,'type'),'axes') %User selects the plot
+elseif isequal(get(gco,'type'),'axes') 
+    %User selects the plot
     points   = flipud(findobj(get(gca,'Children'),'type','scatter'));
     S.ch = find(ismember(S.sp,gco));
     guidata(S.fh,S);
     tmseeg_plot_channel(S);
 end
+    
 end
 
 %Select Point callback
 function button_down_points(varargin)
 % Button down function for Plot Trials GUI
-global points trial
+
 S         = varargin{3};
 S         = guidata(S.fh);
-trial   = find(ismember(points,gco));
+trial = get_trial(S);
 S.trial = trial;
 guidata(S.fh,S);
-
-tmseeg_plot_Trial(S)
+tmseeg_plot_trial(S);
 end
+
 
 % Display Attribute Calculation
 function SM = Get_SM(EEG)
+
+EEG.data;
+
 global VARS
 N     = EEG.trials;
 ch = EEG.nbchan;
-SM    = zeros(EEG.nbchan,N);
-findobj('tag','var')
-get(findobj('tag','var'),'value')
+SM    = zeros(ch,N);
+findobj('tag','var');
+get(findobj('tag','var'),'value');
 
 %Attribute Extraction window, Pulse window
 t_st  = find(EEG.times>VARS.TIME_ST,1,'first');
@@ -466,28 +463,49 @@ p_end = find(EEG.times<VARS.PULSE_END,1,'last');
 %Filter Design
 Fs=EEG.srate;
 ord = 2;
-[z1 p1 k1]      = butter(ord,[VARS.FREQ_MIN VARS.FREQ_MAX]/(Fs/2),'bandpass');
+[z1, p1, k1]      = butter(ord,[VARS.FREQ_MIN VARS.FREQ_MAX]/(Fs/2),'bandpass');
 [xall1,yall2]   = zp2sos(z1,p1,k1);
 
 switch get(findobj('tag','vv'),'value')
-    case 1
-        time = [t_st:t_end];
+   case 1
+        time = t_st:t_end;
         for trl = 1:N
-            EEG_filt = filtfilt(xall1,yall2,double(EEG.data(:,time,trl)));
-            SM(:,trl) = log(max(EEG_filt,[],2)-min(EEG_filt,[],2));
+            EEG_filt = filtfilt(xall1,yall2,double(EEG.data(:,time,trl))');
+            SM(:,trl) = log(max(EEG_filt,[],1)'-min(EEG_filt,[],1)');
         end
-    case 2
+   case 2
         time = [t_st:p_st p_end:t_end];
         for trl = 1:N
-            EEG_filt = filtfilt(xall1,yall2,double(EEG.data(:,time,trl)));
-            SM(:,trl) = log(max(EEG_filt,[],2)-min(EEG_filt,[],2));
-        end
+            EEG_filt = filtfilt(xall1,yall2,double(EEG.data(:,time,trl))');
+            SM(:,trl) = log(max(EEG_filt,[],1)'-min(EEG_filt,[],1)');
+        end   
     case 3
         time = [t_st:p_st p_end:t_end];
         for trl = 1:N
-            EEG_filt = filtfilt(xall1,yall2,double(EEG.data(:,time,trl)));
-            SM(:,trl) = log(sum(abs(diff(EEG_filt,1,2)),2));
+            EEG_filt = filtfilt(xall1,yall2,double(EEG.data(:,time,trl))');
+            SM(:,trl) = log(sum(abs(diff(EEG_filt,1,1)'),2));
         end
 end
 SM = SM*(N/(max(SM(:))-min(SM(:)))) - min(SM(:));
+
 end
+
+
+%Return the trial number when clicking on a scatter point
+function trial = get_trial(varargin)
+
+%get points and coordinates
+points=flipud(findobj(get(gca,'Children')));
+xdata = get(points,'XData');
+ydata = get(points,'YData');
+
+%get coordinates of click point
+current_point = get(gca,'CurrentPoint');
+xcurrent_point = current_point(1,1);
+ycurrent_point = current_point(1,2);
+
+%get trial (min distance between click point and points)
+[~,trial]=min((xdata-xcurrent_point).^2+(ydata-ycurrent_point).^2);
+
+end
+

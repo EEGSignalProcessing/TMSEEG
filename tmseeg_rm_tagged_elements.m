@@ -70,7 +70,7 @@ end
 if any(~toDelete(:))
     EEGkk   = EEG;
     x       = find(any(~toDelete,2));
-    
+    disp(['Interpolating ' num2str(numel(x)) ' channels within trials'])
     EEGkk   = pop_interp(EEGkk, x, 'spherical');
     for i = 1:numel(x)
         newdata = find(~toDelete(x(i),:));

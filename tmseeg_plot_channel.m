@@ -33,6 +33,12 @@
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
+%
+%
+% Updated on Dec 2017 by Ben Schwartzmann 
+% Plot Channels is now faster 
+
+
 
 function tmseeg_plot_channel(S)
 %plot_channel_new - creates initial GUI and initializes labels based on
@@ -124,7 +130,7 @@ function deleteChannel(varargin)
 %Called by "R/Channel" button, marks/unmarks the trial deletion based on
 %the current deletion status, updates the GUI display.
 
-global lines linecolor basepath prevback
+global lines linecolor basepath
 S     = varargin{3};
 S     = guidata(S.fh);
 
@@ -162,8 +168,8 @@ if ~isempty(S.toDelete)
             save(fullfile(basepath,[S.name '_' num2str(S.step_num) '_toDelete.mat']), 'toDelete'); 
             guidata(S.fh,S);
             set(lines,'Color',linecolor,'LineWidth',1);
-            but = findobj('tag','rm_ch')
-            set(but,'string','Undel Ch')
+            but = findobj('tag','rm_ch');
+            set(but,'string','Undel Ch');
             S.Sp_ch_labels(S.ch).ch_txt = 'Undel Ch';
             set(gca,'Color',[0.5 0.5 0.5])
             guidata(S.fh,S);
@@ -181,8 +187,8 @@ else
         save(fullfile(basepath,[S.name '_' num2str(S.step_num) '_toDelete.mat']), 'toDelete'); 
         guidata(S.fh,S);
         set(lines,'Color',linecolor,'LineWidth',1);
-        but = findobj('tag','rm_ch')
-        set(but,'string','Undel Ch')
+        but = findobj('tag','rm_ch');
+        set(but,'string','Undel Ch');
         S.Sp_ch_labels(S.ch).ch_txt = 'Undel Ch';
         set(gca,'Color',[0.5 0.5 0.5])
         guidata(S.fh,S);
@@ -196,7 +202,7 @@ function deleteChannelInTrial(varargin)
 %Called by "R/ Trial in Chan" button or right mouse button, marks/unmarks a
 %selected trial for deletion and updates its appearance.
 
-global trial lines linecolor dotcolor basepath
+global trial lines linecolor dotcolor basepath colorsDot
 S          = varargin{3};
 S          = guidata(S.fh);
 S.trial    = trial;
@@ -204,10 +210,10 @@ S.trial    = trial;
 del_pair = [S.trial  S.ch];
 
 if ~isempty(S.toDelete) && (any(ismember(S.toDelete,del_pair,'rows')))  %Undelete Trial
-
     S.toDelete = S.toDelete(~ismember(S.toDelete,del_pair,'rows'),:);
     p   = flipud(findobj(S.sp(S.ch),'type','scatter'));
-    set(p(S.trial),'CData',[0 0 0])
+    colorsDot(del_pair(:,1),:,S.ch)=repmat([0 0 0],size(del_pair,1),1);
+    set(p,'CData',colorsDot(:,:,S.ch));
     if get(findobj('tag','visible'),'value')
         set(lines(trial),'Color','default','LineWidth',1);
     else
@@ -216,7 +222,9 @@ if ~isempty(S.toDelete) && (any(ismember(S.toDelete,del_pair,'rows')))  %Undelet
 else
     S.toDelete = cat(1,S.toDelete, del_pair);
     p   = flipud(findobj(S.sp(S.ch),'type','scatter'));
-    set(p(S.trial),'CData',dotcolor)
+    
+    colorsDot(del_pair(:,1),:,S.ch)=repmat(dotcolor,size(del_pair,1),1);
+    set(p,'CData',colorsDot(:,:,S.ch));
 
     if get(findobj('tag','visible'),'value')
         set(lines(trial),'Color',linecolor,'LineWidth',1);
@@ -226,7 +234,7 @@ else
 end
 
 guidata(S.fh,S);
-toDelete = S.toDelete;
+toDelete = S.toDelete; %#ok
 save(fullfile(basepath,[S.name '_' num2str(S.step_num) '_toDelete.mat']), 'toDelete'); 
 uicontrol(findobj('tag','pop'))
 end

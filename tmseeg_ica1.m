@@ -21,7 +21,6 @@ function [] = tmseeg_ica1(S,step_num)
 global basepath existcolor
     %Data Load
     [files, EEG] = tmseeg_load_step(step_num);
-    
     %Run ICA, save new dataset
     h1 = msgbox('Running ICA1,now!');
     EEG   = pop_runica( EEG, 'icatype' ,'fastica','g','tanh','approach','symm');
