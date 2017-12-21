@@ -32,6 +32,7 @@ MAINTAINER
 Current Maintainers: 
 * Faranak Farzan
 * Sravya Atluri
+* Benjamin Schwartzmann
 
 REPOSITORY WORKFLOW
 --------------
