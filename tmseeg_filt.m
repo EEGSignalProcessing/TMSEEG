@@ -382,14 +382,14 @@ step_num = varargin{4};
 %Filter Design
 Fs=EEG.srate;
 ord = VARS.IIR_FILTER_ORDER;
-[z1 p1 k1]      = butter(ord,[filt1_slider_low_iir filt1_slider_high_iir]/(Fs/2),'bandpass');
+[z1, p1, k1]      = butter(ord,[filt1_slider_low_iir filt1_slider_high_iir]/(Fs/2),'bandpass');
 [xall1,yall2]   = zp2sos(z1,p1,k1);
-[z2 p2 k2]      = butter(ord, [notch_center-(notch_size/2) notch_center+(notch_size/2)]/(Fs/2), 'stop'); % 10th order filter
+[z2, p2, k2]      = butter(ord, [notch_center-(notch_size/2) notch_center+(notch_size/2)]/(Fs/2), 'stop'); % 10th order filter
 [xs1,xs2]       = zp2sos(z2,p2,k2); % Convert to 2nd order sections form
 
 %Apply Filter
 for ch=1:size(EEG.data,1)
-	tempA=filtfilt(xall1,yall2,double(EEG.data(ch,:)));
+	tempA=filtfilt(xall1,yall2,reshape(double(EEG.data(ch,:)),size(EEG.data,2),size(EEG.data,3))); %changed by Ben
 	tempB=filtfilt(xs1,xs2,double(tempA)); % apply notch filter
 	EEG.data(ch,:)= double(tempB);
 end
