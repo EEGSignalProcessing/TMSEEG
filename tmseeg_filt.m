@@ -391,7 +391,7 @@ ord = VARS.IIR_FILTER_ORDER;
 for ch=1:size(EEG.data,1)
 	tempA=filtfilt(xall1,yall2,reshape(double(EEG.data(ch,:)),size(EEG.data,2),size(EEG.data,3))); %changed by Ben
 	tempB=filtfilt(xs1,xs2,double(tempA)); % apply notch filter
-	EEG.data(ch,:)= double(tempB);
+	EEG.data(ch,:,:)= double(tempB);
 end
 tmseeg_step_check(files, EEG, A, step_num)
 
