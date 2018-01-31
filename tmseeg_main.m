@@ -1,10 +1,11 @@
 % Author: Matthew Frehlich, Ye Mei, Luis Garcia Dominguez,Faranak Farzan
-% 2016
-% Updates by Ben Schwartzmann 2017
+%         2016
+%         Ben Schwartzmann 
+%         2017
 
 % tmseeg_main: Main GUI for the TMSEEG app, a GUI-based signal
-% processing software for TMS-EEG Data.  This program creates the parent
-% structure/figure.  Steps in the processing workflow are denoted by
+% processing software for TMS-EEG Data. This program creates the parent
+% structure/figure. Steps in the processing workflow are denoted by
 % buttons, which call specific functions encapsulating the processing
 % workflow for each step.
 % 
@@ -21,30 +22,31 @@
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
-function []=tmseeg_main()
+
+
+function [] = tmseeg_main()
 
 close all
 clc
-global basepath xshowlimit yshowlimit backcolor basefile
-% xshowlimit  = 200;
 
+global basepath basefile backcolor
 backcolor   = [0.8 0.9 1];
 basefile    = 'None Selected';
 
 % Main object, GUI Parent figure
 S      = []; 
 S.hfig = figure('menubar','none',...
-              'Toolbar','none',...
-              'Units','normalized',...
-              'name','tmseeg',...
-              'numbertitle','off',...
-              'resize','on',...
-              'Color',backcolor,...
-              'Position',[0.1 0.1 0.6 0.4],...
-              'DockControls','off');
+                'Toolbar','none',...
+                'Units','normalized',...
+                'Name','tmseeg',...
+                'Numbertitle','off',...
+                'Resize','on',...
+                'Color',backcolor,...
+                'Position',[0.1 0.1 0.6 0.4],...
+                'DockControls','off');
 
-%% MAIN GUI BUTTONS/TEST         
-global existcolor notexistcolor VARS
+% Main GUI Buttons        
+global existcolor notexistcolor
 existcolor    = [0.7 1 0.7];
 notexistcolor = [1 0.7 0.7];
 
@@ -56,6 +58,7 @@ col_3 = 0.5;
 col_4 = 0.9;
 st = 5/7;
 stepb_w = 0.4;
+sw = 0.1;
 
 % ------------------Main Buttons for processing steps----------------------
 S.button1 = uicontrol('Parent', S.hfig,'Style','pushbutton',...
@@ -125,8 +128,6 @@ S.button11 = uicontrol('Parent', S.hfig,'Style','pushbutton',...
                    'Callback',{@button_callback11,S}); 
                
 % --------------------- Small Buttons for Data Display --------------------
-sw = 0.1; %small button width
-
 S.button1s = uicontrol('Parent', S.hfig,'Style','pushbutton',...
                    'Units','normalized',...
                    'Position',[col_2 st sw v],...
@@ -193,60 +194,58 @@ S.button11s = uicontrol('Parent', S.hfig,'Style','pushbutton',...
                    'String','Settings',...
                    'Callback',{@button_callback11s,S});
 S.hbutton1  = uicontrol('Style','pushbutton',...
-                    'unit','normalized',...
+                    'Units','normalized',...
                     'HorizontalAlignment','left',...
-                    'position',[0.0 1-v/2 0.2 v/2],...
-                    'fontsize',14,...
+                    'Position',[0.0 1-v/2 0.2 v/2],...
+                    'Fontsize',14,...
                     'Tag','main_text_b',...
-                    'string','Working Folder:',...
+                    'String','Working Folder:',...
                     'Callback',{@wkdirbutton_callback,S});
 S.hbutton2  = uicontrol('Style','pushbutton',...
-                    'unit','normalized',...
+                    'Units','normalized',...
                     'HorizontalAlignment','left',...
-                    'position',[0.0 1-v 0.2 v/2],...
-                    'fontsize',14,...
+                    'Position',[0.0 1-v 0.2 v/2],...
+                    'Fontsize',14,...
                     'Tag','file_text_b',...
-                    'string','Dataset:',...
+                    'String','Dataset:',...
                     'Callback',{@datasetbutton_callback,S});
 
 % ----------------------------- Headers -----------------------------------
 S.htext1 = uicontrol('Style','text',...
-                    'unit','normalized',...
+                    'Units','normalized',...
                     'HorizontalAlignment','left',...
-                    'position',[0.2 1-v/2 0.8 v/2],...
-                    'fontsize',14,...
+                    'Position',[0.2 1-v/2 0.8 v/2],...
+                    'Fontsize',14,...
                     'BackgroundColor',[0.7 0.8 1],...
                     'Tag','main_text',...
                     'string','  Please select data path,first!');
 S.htext2 = uicontrol('Style','text',...
-                    'unit','normalized',...
-                    'position',[0.2 1-v 0.8 v/2],...
+                    'Units','normalized',...
+                    'Position',[0.2 1-v 0.8 v/2],...
                     'HorizontalAlignment','left',...
-                    'fontsize',14,...
+                    'Fontsize',14,...
                     'BackgroundColor',[0.7 0.8 1],...
                     'Tag','file_text',...
                     'string',['  ' basefile]);
 
 % -------------------------------Initial Loading---------------------------
-VARS        = tmseeg_init();
-S.num_steps = 10; %Must specify number of steps in processing workflow
-yshowlimit  = VARS.YSHOWLIMIT;
+global VARS
+VARS = tmseeg_init();
+
+%Must specify number of steps in processing workflow
+S.num_steps = 10; 
+
 
 %% Callback Functions
 
-
-
-
-%Working Directory Callback
+%Call to working directory
 function wkdirbutton_callback(varargin)
-%     Calls user input for switching working folder and calls
-%     step 1 again
-    
+    %Call user input for working folder
     basepath = uigetdir(pwd,'Select Data Folder');
     h = findobj('Tag','main_text');
     set(h,'String',['  ' basepath ])
     
-    %close all open TMSEEG windows
+    %Close all open TMSEEG windows
     set(S.hfig,'HandleVisibility','off')
     close all;
     set(S.hfig,'HandleVisibility','on')
@@ -257,15 +256,15 @@ function wkdirbutton_callback(varargin)
     h = findobj('Tag','file_text');
     set(h,'String',['  ' basefile ])
     guidata(S.hfig,S);
-    tmseeg_upd_stp_disp(S, '.set', S.num_steps)
-    
+    tmseeg_upd_stp_disp(S, '.set', S.num_steps)  
 end
 
+%Call to dataset
 function datasetbutton_callback(varargin)
-    %Load Selected dataset, update display
-    [filename, pathname] = ...
+    %Load selected dataset, update display
+    [filename] = ...
     uigetfile(fullfile(basepath,'*.set'),'Select Original File');
-    [~,basefile,ext]         = fileparts(filename);
+    [~,basefile,ext] = fileparts(filename);
     tmseeg_upd_stp_disp(S, ext, S.num_steps)
     
     %Update Parent GUI
@@ -276,60 +275,60 @@ end
 
 %Step 1 - Data Loading and Preprocessing
 function button_callback1(varargin)
-    tmseeg_init_proc(S,1);
+    tmseeg_init_proc(S, 1);
 end
 
 %Step 2 - Remove TMS Pulse
 function button_callback2(varargin)
-    tmseeg_rm_TMS_art(S,2);
+    tmseeg_rm_TMS_art(S, 2);
 end
 
 %Step 3 - Remove Bad Channels and Trials
 function button_callback3(varargin)
-    tmseeg_rm_ch_tr_1(S,3);
+    tmseeg_rm_ch_tr_1(S, 3);
 end
 
 %Step 4 - Run ICA1
 function button_callback4(varargin)
-    tmseeg_ica1(S,4)
+    tmseeg_ica1(S, 4)
 end
 
 %Step 5 - Remove ICA1 components for delay artifact
 function button_callback5(varargin)
-    tmseeg_rm_TMS_decay(S,5);
+    tmseeg_rm_TMS_decay(S, 5);
 end
 
 %Step 6 - Remove Power line noise, highpass/lowpass filter
 function button_callback6(varargin)
-    tmseeg_filt(S,6);
+    tmseeg_filt(S, 6);
 end
 
 %Step 7 - Run ICA2
 function button_callback7(varargin)
-    tmseeg_ica2(S,7)
+    tmseeg_ica2(S, 7)
 end
 
 %Step 8 - Remove ICA2 Components
 function button_callback8(varargin)
-     tmseeg_ica2_remove(S,8);
+     tmseeg_ica2_remove(S, 8);
 end
 
-% Step 9 - Remove Bad Channels and Trials
+%Step 9 - Remove Bad Channels and Trials
 function button_callback9(varargin)
-    tmseeg_rm_ch_tr_2(S,9);
+    tmseeg_rm_ch_tr_2(S, 9);
 end
 
-% Step 10 - Interpolation and Final Processing
+%Step 10 - Interpolation and Final Processing
 function button_callback10(varargin)
-     tmseeg_interpolation(S,10);
+     tmseeg_interpolation(S, 10);
 end
 
-% Call to EEGLAB
+%Call to EEGLAB
 function button_callback11(varargin)
     eeglab;
 end
 
-% View Data buttons
+%Call to data display
 function button_callback1s(varargin)
     tmseeg_show(1);
 end
@@ -374,6 +373,7 @@ end
 function button_callback11s(varargin)
     tmseeg_settings(S);
 end
+
 end
 
 

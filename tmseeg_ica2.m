@@ -1,9 +1,11 @@
-% Author: Matthew Frehlich, Ye Mei, Luis Garcia Dominguez,Faranak Farzan
-% 2016
+% Author: Matthew Frehlich, Ye Mei, Luis Garcia Dominguez, Faranak Farzan
+%         2016
+%         Ben Schwartzmann
+%         2017
 
-% tmseeg_ica1() - runs ICA round 2 on input EEG dataset
+% tmseeg_ica2() - runs ICA round 2 on input EEG dataset
 % 
-% inputs:  S        - parent GUI structure
+% Inputs:  S        - parent GUI structure
 %          step_num - step number of tmseeg_rm_TMS_decay in workflow
 
 % This program is free software; you can redistribute it and/or modify
@@ -17,12 +19,11 @@
 % GNU General Public License for more details.
 
 
-function [] = tmseeg_ica2(S,step_num)
-%Runs Independent Component Analysis on the dataset from the previous step
- %using EEGLab's pop_runica()
+function [] = tmseeg_ica2(S, step_num)
 
-if tmseeg_previous_step(step_num) %added by Ben Schwartzmann
-    return %if cant load previous steps current step is aborted
+%Check if previous steps were done
+if tmseeg_previous_step(step_num) 
+    return 
 end
 
 global VARS
@@ -33,11 +34,11 @@ VARS.ICA2_COMP_NUM = ceil(EEG.nbchan*VARS.ICA_COMP_PCT/100);
     
 %Run ICA2
 h1 = msgbox('Running ICA2,now!');
-EEG   = pop_runica( EEG, 'icatype' ,'fastica','g','tanh',...
+EEG = pop_runica( EEG, 'icatype' ,'fastica','g','tanh',...
         'approach','symm','lasteig',VARS.ICA2_COMP_NUM);
     
-tmseeg_step_check(files, EEG, S, step_num)
-close(h1)
+tmseeg_step_check(files, EEG, S, step_num);
+close(h1);
 
 end
 

@@ -1,5 +1,7 @@
-% Author: Matthew Frehlich, Ye Mei, Luis Garcia Dominguez,Faranak Farzan
-% 2016
+% Author: Matthew Frehlich, Ye Mei, Luis Garcia Dominguez, Faranak Farzan
+%         2016
+%         Ben Schwartzmann 
+%         2017
 
 % tmseeg_show() - Displays EEG data in a butterfly plot after the processing 
 % step given by afterstep
@@ -15,14 +17,17 @@
 % GNU General Public License for more details.
 
 function []=tmseeg_show(afterstep)
-global basepath hfinalax hzoom xshowmin xshowmax yshowlimit backcolor VARS
+
+global hfinalax hzoom xshowmin xshowmax yshowlimit backcolor VARS
+
 hfig = figure('Units','normalized',...
-              'name',['EEG After Step ' num2str(afterstep)],...
-              'numbertitle','off',...
-              'resize','on',...
-              'color',backcolor,...
+              'Name',['EEG After Step ' num2str(afterstep)],...
+              'Numbertitle','off',...
+              'Resize','on',...
+              'Color',backcolor,...
               'Position',[0 0 0.7 0.7],...
-              'DockControls','off');
+              'DockControls','off'); %#ok
+          
 pre_pulse_deletion = 0;
 
 yshowlimit = VARS.YSHOWLIMIT;
@@ -35,12 +40,13 @@ if xshowmax > VARS.EPCH_END
     xshowmax = VARS.EPCH_END;
 end
 %Load proper dataset
-[files, EEG] = tmseeg_load_step(afterstep + 1);
+[~, EEG] = tmseeg_load_step(afterstep + 1);
 
 if afterstep == 1 || afterstep == 10
     pre_pulse_deletion = 1;
 end
-EEGtimes  = EEG.times;             
+%EEGtimes  = EEG.times;
+
 %Create topo plot with EEGLAB timtopo() command  
 if(pre_pulse_deletion)
     data_temp = squeeze(nanmean(EEG.data,3));
@@ -54,7 +60,7 @@ else
     end
 
     %Insert NaN values to fill space where TMS pulse was removed
-    ix       = min(EEG.TMS_period2remove_1);
+    ix = min(EEG.TMS_period2remove_1);
     rm_pulse_fill = NaN(size(data_temp,1),length(EEG.TMS_period2remove_1));
     data_temp = cat(2,data_temp(:,1:ix-1),rm_pulse_fill,data_temp(:,ix:end));
 
@@ -66,10 +72,10 @@ timtopo(data, EEG.chanlocs,'limits',[xshowmin xshowmax -yshowlimit yshowlimit])
 
 %Load EEG Data, display in custom plot allowing zoom feature
 
-figure('units','normalized',...
-        'numbertitle','off',...
-        'name',['After Step ' num2str(afterstep)],...
-        'position',[0 0 .9 .9 ]);
+figure('Units','normalized',...
+        'Numbertitle','off',...
+        'Name',['After Step ' num2str(afterstep)],...
+        'Position',[0 0 .9 .9 ]);
 
 x = EEGtimes(EEGtimes>=xshowmin & EEGtimes<=xshowmax);
 y = squeeze(nanmean(data,3));

@@ -1,9 +1,12 @@
 % Author: Matthew Frehlich, Ye Mei, Luis Garcia Dominguez,Faranak Farzan
-% 2016
+%         2016
+%         Ben Schwartzmann
+%         2017  
 
 % tmseeg_init_proc() - Initial Data processing (epoching, baseline,
 % resampling, selecting channels for removal.
-% inputs:   S        - GUI parent structure
+%
+% Inputs:   S        - GUI parent structure (structure)
 %           step_num - step number in workflow (for modularity)
 
 % This program is free software; you can redistribute it and/or modify
@@ -17,10 +20,11 @@
 % GNU General Public License for more details.
 
 
-function [] = tmseeg_init_proc(S,step_num)
+function [] = tmseeg_init_proc(S, step_num)
 
-if tmseeg_previous_step(step_num) %added by Ben Schwartzmann
-    return %if cant load previous steps current step is aborted
+%Check if previous steps were done
+if tmseeg_previous_step(step_num)
+    return 
 end
 
 global basepath basefile VARS
@@ -33,8 +37,8 @@ files   = dir(fullfile(basepath,[basefile '.set']));
 
 % added July 2017 to work cross platform; special case for Macs to find
 % appropriate eeglab installation. -C.M.
-if findstr(computer, 'MAC')
-    [a findEEGLab] = system('find ~/ -name eeglab.m'); % find eeglab.m instances
+if contains(computer, 'MAC')
+    [~, findEEGLab] = system('find ~/ -name eeglab.m'); % find eeglab.m instances
     cellDirs       = strsplit(findEEGLab); % split output into functional cells
     containsApps   = strfind(cellDirs, '/Apps/'); % discern instance of eeglab in "Apps"
     
@@ -45,41 +49,43 @@ if findstr(computer, 'MAC')
     addpath(genpath(gotoDir)) % add eeglab files to path
     eval(['cd ' gotoDir]) % change into eeglab directory
 end
-EEG     = pop_loadset('filename',[basefile '.set'],'filepath',basepath);
-h           = msgbox('Initial Data Processing...','Importing Dataset','help');
-child       = get(h,'Children');
-delete(child(3))
 
-EEG     = epoch_prompt(EEG);
-EEG     = baseline_prompt(EEG);
+EEG = pop_loadset('filename',[basefile '.set'],'filepath',basepath);
+h = msgbox('Initial Data Processing...','Importing Dataset','help');
+child = get(h,'Children');
+delete(child(3));
+
+EEG = epoch_prompt(EEG);
+EEG = baseline_prompt(EEG);
 
 %Check for data sampling rate, ask for resampling
-EEG         = resample_prompt(EEG);
+EEG = resample_prompt(EEG);
 
 %Custom chanlocs file
 select_chanlocs = questdlg('Channel locations are set to standard 385-electrode format.  Select a custom channel location file?');
+
 if strcmp(select_chanlocs,'Yes')
     EEG = pop_chanedit(EEG);
 else
-    EEG         = pop_chanedit(EEG, 'lookup',VARS.CHANLOC_FILE);
+    EEG = pop_chanedit(EEG, 'lookup', VARS.CHANLOC_FILE);
 end
-EEG         = eeg_checkset( EEG );
+
+EEG = eeg_checkset( EEG );
 
 del_chans = questdlg('Select and delete channels?');
+
 if strcmp(del_chans,'Yes')
     EEG     = channels_del(EEG);   
-    EEG     = eeg_checkset( EEG );
+    EEG     = eeg_checkset(EEG);
 end
-
 
 %Saving original channels and epoch length before modifications
 EEG.chanloc_orig = EEG.chanlocs; 
 EEG.epoch_length = length(EEG.times)/EEG.srate;
 
-
-tmseeg_step_check(files, EEG, S, S.step_num)
-close(h)
-tmseeg_upd_stp_disp(S, '.set', S.step_num)
+tmseeg_step_check(files, EEG, S, S.step_num);
+close(h);
+tmseeg_upd_stp_disp(S, '.set', S.step_num);
 
 end
 
@@ -102,13 +108,13 @@ done_button = uicontrol('style','pushbutton',...
      'string','Done',...
      'Position',[0.75 0.1 0.1 0.05],...
      'Parent',t,...
-     'Callback',{@retrieve_value,channel_list,t, {EEG.chanlocs.labels}});
+     'Callback',{@retrieve_value,channel_list,t, {EEG.chanlocs.labels}}); %#ok
 cancel_button = uicontrol('style','pushbutton',...
      'Units','normalized',...
      'string','Cancel',...
      'Position',[0.75 0.05 0.1 0.05],...
      'Parent',t,...
-     'Callback',{@cancel_call,t});
+     'Callback',{@cancel_call,t}); %#ok
 waitfor(t)
 
 EEG = pop_select(EEG, 'nochannel', chans_rm);
@@ -138,12 +144,14 @@ global chans_rm
 h_list = varargin{3};
 labels = varargin{5};
 chans_sel = get(h_list,'value');
-del_txt = ['Delete channels ?' labels(chans_sel) ];
+del_txt = ['Delete channels ?' labels(chans_sel)];
 choice = questdlg(del_txt);
+
 if strcmp(choice,'Yes')
     chans_rm = chans_sel;
     close(varargin{4})
 end
+
 end
 
 function cancel_call(varargin)
@@ -155,30 +163,33 @@ function [EEG_resamp] = resample_prompt(EEG)
 % Pop-up guided selection of resampling process
 global VARS
 
-    sample_str = ['Sampling rate of data is ', num2str(EEG.srate),...
-        'Hz.  Recommend resampling to 1000Hz, would you like to resample?'];
-    resample_data = questdlg(sample_str);
-    if strcmp(resample_data,'Yes')
-        disp_str = ['Enter resampling rate for data (200 - ' num2str(EEG.srate) ' Hz)'];
-        prompt = {disp_str};
-        dlg_title = 'Input';
-        num_lines = 1;
-        defaultans = {num2str(VARS.RESAMPLE_FREQ)};
-        user_freq = inputdlg(prompt,dlg_title,num_lines,defaultans);
-        resamp_select = str2num(user_freq{1});
-        if resamp_select < 200 || resamp_select > EEG.srate
-            warning('Invalid Resampling frequency, please select a frequency from the recommended range')
-            EEG = resample_prompt(EEG);
-        else
-            VARS.RESAMPLE_FREQ = resamp_select;
-            EEG         = pop_resample( EEG, VARS.RESAMPLE_FREQ);   %resample to 1KHz
-            EEG         = eeg_checkset( EEG );
-        end
-        EEG_resamp = EEG;
+sample_str = ['Sampling rate of data is ', num2str(EEG.srate),...
+    'Hz.  Recommend resampling to 1000Hz, would you like to resample?'];
+resample_data = questdlg(sample_str);
 
+if strcmp(resample_data,'Yes')
+    disp_str = ['Enter resampling rate for data (200 - ' num2str(EEG.srate) ' Hz)'];
+    prompt = {disp_str};
+    dlg_title = 'Input';
+    num_lines = 1;
+    defaultans = {num2str(VARS.RESAMPLE_FREQ)};
+    user_freq = inputdlg(prompt, dlg_title, num_lines, defaultans);
+    resamp_select = str2double(user_freq{1});
+    
+    if resamp_select < 200 || resamp_select > EEG.srate
+        warning('Invalid Resampling frequency, please select a frequency from the recommended range')
+        EEG = resample_prompt(EEG);
     else
-        EEG_resamp = EEG;           
+        VARS.RESAMPLE_FREQ = resamp_select;
+        EEG         = pop_resample(EEG, VARS.RESAMPLE_FREQ);   %resample to 1KHz
+        EEG         = eeg_checkset(EEG);
     end
+    
+    EEG_resamp = EEG;
+
+else
+    EEG_resamp = EEG;           
+end
 
 end
 
@@ -195,38 +206,44 @@ if strcmp(baseline,'Yes') %Choose to resample
     dlg_title = 'Baseline Settings';
     num_lines = 1;
     defaultans = {num2str(VARS.BASELINE_RNG)};
-    answer = inputdlg(prompt,dlg_title,num_lines,defaultans);
+    answer = inputdlg(prompt, dlg_title, num_lines, defaultans);
 
-if (length(answer) ~= 0) %User enters a resampling value
-    try
-        VARS.BASELINE_RNG = str2num(answer{1});
-        EEG               = pop_rmbase(EEG,VARS.BASELINE_RNG); 
-    catch
-        error('Could not baseline data with given settings')
+    if isempty(answer) %User enters a resampling value
+        
+        try
+            VARS.BASELINE_RNG = str2double(answer{1});
+            EEG               = pop_rmbase(EEG, VARS.BASELINE_RNG); 
+        catch
+            error('Could not baseline data with given settings')
+        end
+        
     end
 end
-end
+
 end
 
 function [EEG] = epoch_prompt(EEG)
 % Pop-up guide format for user epoch input
 global VARS
+
 if isempty(EEG.epoch) %Epoch if data is not already epoched
 
     %User selection of event type (2 possible format types)
     try
         eventstr = unique({EEG.event.type});
     catch
+        
         try
             eventstr = {EEG.event.type};
             eventstr = strsplit(num2str(unique(horzcat(eventstr{:}))),' ');
         catch
             error('Incompatible EEG event type format, please epoch using EEGLAB')
         end
+        
     end
 
      %Epoch event selection
-    [i,sel] = listdlg('PromptString','Select epoch event',...
+    [i, sel] = listdlg('PromptString','Select epoch event',...
                     'SelectionMode','single',...
                     'ListString',eventstr);
     if sel
@@ -234,15 +251,15 @@ if isempty(EEG.epoch) %Epoch if data is not already epoched
         prompt = {'Enter epoch start (ms)','Enter epoch end (ms)'};
         dlg_title = 'Input';
         num_lines = 1;
-        defaultans = {num2str(VARS.EPCH_STRT),num2str(VARS.EPCH_END)};
-        tf = inputdlg(prompt,dlg_title,num_lines,defaultans);
-        usr_epch_st  = str2num(tf{1});
-        usr_epch_end = str2num(tf{2});
+        defaultans = {num2str(VARS.EPCH_STRT), num2str(VARS.EPCH_END)};
+        tf = inputdlg(prompt, dlg_title, num_lines, defaultans);
+        usr_epch_st  = str2double(tf{1});
+        usr_epch_end = str2double(tf{2});
         
         %Setting Epoch times
         VARS.EPCH_STRT = usr_epch_st;
         VARS.EPCH_END  = usr_epch_end;
-        EEG = pop_epoch(EEG,eventstr(i),[VARS.EPCH_STRT/1000 VARS.EPCH_END/1000]);
+        EEG = pop_epoch(EEG, eventstr(i), [VARS.EPCH_STRT/1000 VARS.EPCH_END/1000]);
         
         %Update necessary display settings
         VARS.TIME_ST   = usr_epch_st;
@@ -251,6 +268,7 @@ if isempty(EEG.epoch) %Epoch if data is not already epoched
         if VARS.EPCH_STRT > VARS.TMS_DSP_XMIN
             VARS.TMS_DSP_XMIN = VARS.EPCH_STRT;
         end
+        
         if VARS.EPCH_STRT > (-VARS.ISI + VARS.SLIDER_MIN)
             VARS.ISI = -VARS.EPCH_STRT + VARS.SLIDER_MIN + 10;
         end
@@ -258,6 +276,7 @@ if isempty(EEG.epoch) %Epoch if data is not already epoched
         if VARS.EPCH_STRT > VARS.UPD_WDW_STRT
             VARS.UPD_WDW_STRT = VARS.EPCH_STRT;
         end
+        
         if VARS.EPCH_END < VARS.UPD_WDW_END
             VARS.UPD_WDW_END  = VARS.EPCH_END;
         end
@@ -265,6 +284,8 @@ if isempty(EEG.epoch) %Epoch if data is not already epoched
     else
         warning('No epoch event selected, continuing without epoching')
     end
+    
 end
+
 end
 

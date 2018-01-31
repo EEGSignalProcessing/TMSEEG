@@ -1,8 +1,13 @@
-% Author: Matthew Frehlich, Ye Mei, Luis Garcia Dominguez,Faranak Farzan
-% 2016
+% Author: Matthew Frehlich, Ye Mei, Luis Garcia Dominguez, Faranak Farzan
+%         2016
+%         Ben Schwartzmann 
+%         2017
 
 % tmseeg_ica1() - Runs Independent Component Analysis using the pop_runica
 % EEGLAB function and the fastica algorithm
+%
+% Inputs: S        - parent GUI information (structure)
+%         step_num - Step number for current cleaning step in workflow
 
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -15,24 +20,23 @@
 % GNU General Public License for more details.
 
 
-function [] = tmseeg_ica1(S,step_num)
-%Runs Independent Component Analysis on the dataset from the previous step
-%using EEGLab's pop_runica()
- 
-if tmseeg_previous_step(step_num) %added by Ben Schwartzmann
-    return %if cant load previous steps current step is aborted
+function [] = tmseeg_ica1(S, step_num)
+
+%Check if previous steps were done
+if tmseeg_previous_step(step_num)
+    return
 end 
  
 %Data Load
 [files, EEG] = tmseeg_load_step(step_num);
 
 %Run ICA, save new dataset
-h1 = msgbox('Running ICA1,now!');
-EEG   = pop_runica( EEG, 'icatype' ,'fastica','g','tanh','approach','symm');
-EEG   = eeg_checkset(EEG);
+h1 = msgbox('Running ICA,now!');
+EEG = pop_runica(EEG, 'icatype' ,'fastica','g','tanh','approach','symm');
+EEG = eeg_checkset(EEG);
 
-tmseeg_step_check(files, EEG, S, step_num)
-close(h1)
+tmseeg_step_check(files, EEG, S, step_num);
+close(h1);
 
 end
 

@@ -1,8 +1,6 @@
 function cantload = tmseeg_previous_step(step_num)
 % tmseeg_previous_step() checks if previous steps were done 
 % if not current step is aborted
-%
-% Created on Nov 2017 by Ben Schwartzmann
 
 global basepath basefile
 
@@ -22,6 +20,7 @@ else
         cantload = 1;
         msgbox('Please do previous steps first');
     end
+    
 end
 
 end

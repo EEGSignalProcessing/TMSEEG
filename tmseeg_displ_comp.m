@@ -1,4 +1,4 @@
-% Author: Ye Mei, Luis Garcia Dominguez,Faranak Farzan   2015
+% Author: Ye Mei, Luis Garcia Dominguez, Faranak Farzan   2015
 
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -10,15 +10,20 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
 
-function tmseeg_displ_comp(comptype,I)
+function tmseeg_displ_comp(comptype, I)
+
 i = comptype>0;
+
 if ~any(i)
     return
 else
     f = find(i);
+    
     for k=1:numel(f)
-        a(k)=find(I==f(k));
-    end    
-    [find(i)' comptype(i)' a(:)]
+        a(k)=find(I==f(k)); %#ok
+    end
+    
+    [find(i)' comptype(i)' a(:)] %#ok
 end
+
 end

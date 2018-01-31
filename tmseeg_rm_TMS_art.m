@@ -3,7 +3,10 @@
 
 % tmseeg_rm_TMS_art() - displays epoched TMSEEG data, allowing
 % user adjustment of TMS Pulse removal with sliders denoting removal times.
-%  Supports the single pulse and double pulse paradigms.
+% Supports the single pulse and double pulse paradigms.
+% 
+% Inputs:   A        - parent GUI structure
+%           step_num - step of tmseeg_rm_ch_tr_1 in workflow
 
 % Display window interface:
 %       "Activity Plot" - [main window] displays the overlain plot of the
@@ -34,10 +37,11 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
 
-function tmseeg_rm_TMS_art(A,step_num)
+function tmseeg_rm_TMS_art(A, step_num)
 
-if tmseeg_previous_step(step_num) %added by Ben Schwartzmann
-    return %if cant load previous steps current step is aborted
+%Check if previous steps were done
+if tmseeg_previous_step(step_num)
+    return
 end
 
 global backcolor VARS
@@ -56,7 +60,7 @@ S.chfig = figure('menubar','none',...
 % Main EEG Data Plot
 subplot(4,5,1:15);
 
-[files, EEG]  = tmseeg_load_step(step_num);
+[~, EEG] = tmseeg_load_step(step_num);
 plot(EEG.times,squeeze(mean(EEG.data,3)));
 xlim([VARS.TMS_DSP_XMIN (VARS.TMS_DSP_XMAX + VARS.PULSE_DURATION)]);
 title('Use Sliders and pulldown menu to control deletion of TMS pulse')
@@ -157,16 +161,16 @@ S.button = uicontrol('Parent', S.chfig,'Style','pushbutton',...
                     'Callback',{@button_callback,S,A,step_num});                
 
 % Set pulse paradigms
-pulse{1}     = 'double pulse';
-pulse{2}     = 'single pulse';
+pulse{1} = 'double pulse';
+pulse{2} = 'single pulse';
 
-S.pop   = uicontrol('Parent', S.chfig,'style','popupmenu',...
-                    'units','normalized',...
-                    'position',[0.2 0.02 .2 0.05],...
-                    'value', 2,...
-                    'string',pulse,... 
-                    'callback',{@single_duo_pulse,S});
-S.text_pulse  = uicontrol('Parent', S.chfig,'Style','text',...
+S.pop = uicontrol('Parent', S.chfig,'Style','popupmenu',...
+                    'Units','normalized',...
+                    'Position',[0.2 0.02 .2 0.05],...
+                    'Value', 2,...
+                    'String',pulse,... 
+                    'Callback',{@single_duo_pulse,S});
+S.text_pulse = uicontrol('Parent', S.chfig,'Style','text',...
                     'String','Select Paradigm:',...
                     'Units','normalized',...
                     'Tag','rmtms_pulse',...
@@ -174,10 +178,10 @@ S.text_pulse  = uicontrol('Parent', S.chfig,'Style','text',...
                     'Callback',{@text_callback2_b,S});
 
 %Setting deletion limits to the slider positions
-S.removeFrom   = s1;
-S.removeTo     = s2;
+S.removeFrom = s1;
+S.removeTo = s2;
 S.removeFrom_b = s1_b;
-S.removeTo_b   = s2_b;
+S.removeTo_b = s2_b;
 
 %Default to Single pulse
 set(S.hl1_b,'Visible','Off');
@@ -193,8 +197,10 @@ end
 function single_duo_pulse(varargin)
 % single_duo_pulse() - called by the S.pop popupmenu, changes visibility of
 %                      GUI objects based off the selected TMS paradigm.
-S       = varargin{3};
-S       = guidata(S.chfig);
+
+S = varargin{3};
+S = guidata(S.chfig);
+
 if get(S.pop,'Value')==2
     set(S.hl1_b,'Visible','Off');
     set(S.hl2_b,'Visible','Off');
@@ -220,26 +226,30 @@ function slider_callback1(varargin)
 % Called by S.slider_pre callback function when slider is moved.
 % Sets minimum removal time to updated slider position, refreshes location
 % of slider and label.
-S       = varargin{3};
-S       = guidata(S.chfig);
+
+S = varargin{3};
+S = guidata(S.chfig);
 set(S.text_pre,'String',get(varargin{1},'Value'));
 S.removeFrom=get(varargin{1},'Value');
 delete(S.hl1);
-S.hl1=line([S.removeFrom S.removeFrom],get(gca,'yLim'));
+S.hl1 = line([S.removeFrom S.removeFrom],get(gca,'yLim'));
 guidata(S.chfig,S);
+
 end
 
 function slider_callback2(varargin)
 % Called by S.slider_pos callback function when slider is moved.
 % Sets maximum removal time to updated slider position, refreshes location
 % of slider and label.
-S          = varargin{3};
-S          = guidata(S.chfig);
+
+S = varargin{3};
+S = guidata(S.chfig);
 set(S.text_pos,'String',get(varargin{1},'Value'));
 S.removeTo = get(varargin{1},'Value');
 delete(S.hl2);
-S.hl2      = line([S.removeTo S.removeTo],get(gca,'yLim'));
+S.hl2 = line([S.removeTo S.removeTo],get(gca,'yLim'));
 guidata(S.chfig,S);
+
 end
 
 
@@ -247,58 +257,63 @@ function slider_callback1_b(varargin)
 % Called by S.slider_pre_b callback function when slider is moved.
 % Sets minimum removal time to updated slider position, refreshes location
 % of slider and label.
-S         = varargin{3};
-S         = guidata(S.chfig);
+
+S = varargin{3};
+S = guidata(S.chfig);
+
 set(S.text_pre_b,'String',get(varargin{1},'Value'));
 S.removeFrom_b=get(varargin{1},'Value');
 delete(S.hl1_b);
-S.hl1_b=line([S.removeFrom_b S.removeFrom_b],get(gca,'yLim'),'Color','r');
+S.hl1_b = line([S.removeFrom_b S.removeFrom_b],get(gca,'yLim'),'Color','r');
 guidata(S.chfig,S);
+
 end
 
 function slider_callback2_b(varargin)
 % Called by S.slider_pos_b callback function when slider is moved.
 % Sets maximum removal time to updated slider position, refreshes location
 % of slider and label.
-S       = varargin{3};
-S       = guidata(S.chfig);
+
+S = varargin{3};
+S = guidata(S.chfig);
 set(S.text_pos_b,'String',get(varargin{1},'Value'));
-S.removeTo_b=get(varargin{1},'Value');
+S.removeTo_b = get(varargin{1},'Value');
 delete(S.hl2_b);
-S.hl2_b=line([S.removeTo_b S.removeTo_b],get(gca,'yLim'),'Color','r');
+S.hl2_b = line([S.removeTo_b S.removeTo_b],get(gca,'yLim'),'Color','r');
 guidata(S.chfig,S);
+
 end
 
 function button_callback(varargin)
 % Called by selection of "Delete TMS" button. calls tmseeg_removeTMS_func()
-S        = varargin{3};
-A        = varargin{4};
+S = varargin{3};
+A = varargin{4};
+
 step_num = varargin{5};
-S        = guidata(S.chfig);
-tmseeg_removeTMS_func(S,A,step_num)
+S = guidata(S.chfig);
+tmseeg_removeTMS_func(S, A ,step_num)
 guidata(S.chfig,S);
 close
+
 end
 
 function tmseeg_removeTMS_func(S,A,step_num)
 % removes TMS pulse period based on the position of the sliders
-global basepath existcolor basefile
 
 removeFrom  = S.removeFrom; 
-removeTo      = S.removeTo; 
-removeFrom_b  = S.removeFrom_b; 
-removeTo_b     = S.removeTo_b;
+removeTo = S.removeTo; 
+removeFrom_b = S.removeFrom_b; 
+removeTo_b = S.removeTo_b;
 
 [files, EEG]  = tmseeg_load_step(step_num);
-[~,name,ext] = fileparts(files.name);
+%[~,name,ext] = fileparts(files.name);
 temp_removeFrom = find(floor(EEG.times)<=removeFrom);
 temp_removeTo = find(floor(EEG.times)<=removeTo);
 period2remove = temp_removeFrom(end)+1:temp_removeTo(end)-1;
-EEG           = eeg_checkset( EEG );
+EEG = eeg_checkset( EEG );
 
 %Single Pulse removal case
 if get(S.pop,'Value')==2    
-
         EEG.data(:,period2remove,:) = [];
         EEG.times(period2remove)    = [];
         EEG.TMS_period2remove_1     = period2remove;
@@ -307,27 +322,27 @@ if get(S.pop,'Value')==2
         EEG                         = eeg_checkset( EEG ); % some adjustments would be made
 %Double pulse removal case
 else
-
         EEG.data(:,period2remove,:) = [];  
         EEG.times(period2remove)    = []; 
         EEG.TMS_period2remove_1     = period2remove; 
         EEG.pnts                    = numel(EEG.times); 
-        EEG                         = eeg_checkset( EEG );
+        EEG                         = eeg_checkset(EEG);
         
         temp_removeFrom_b = find(floor(EEG.times)<=removeFrom_b);
         temp_removeTo_b = find(floor(EEG.times)<=removeTo_b);
         period2remove_b = temp_removeFrom_b(end)+1:temp_removeTo_b(end)-1;
         
-        EEG             = eeg_checkset( EEG );
+        EEG                           = eeg_checkset(EEG);
         EEG.data(:,period2remove_b,:) = [];
         EEG.times(period2remove_b)    = [];  
         EEG.TMS_period2remove_b       = period2remove_b;
-        EEG                           = eeg_checkset( EEG );
+        EEG                           = eeg_checkset(EEG);
         EEG.custom.times              = EEG.times;
         EEG.pnts                      = numel(EEG.times);
-        EEG                           = eeg_checkset( EEG ); % some adjustments would be made
+        EEG                           = eeg_checkset(EEG); % some adjustments would be made
 end
-tmseeg_step_check(files, EEG, A, step_num)
+
+tmseeg_step_check(files, EEG, A, step_num);
 
 end
 

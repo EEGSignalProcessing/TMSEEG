@@ -3,9 +3,6 @@ function [] = tmseeg_upd_stp_disp(S, ext, num_steps)
 % Using path and file information, sets the buttons as either
 % 'existcolor'(active) or 'notexistcolor' (inactive), both set as global
 % variables
-%
-% Updated on Nov 2017 by Ben Schwartzmann 
-% Make it compatible with Linux and Mac
 
 global existcolor notexistcolor basepath basefile
 checkext = '';

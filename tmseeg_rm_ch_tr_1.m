@@ -1,12 +1,13 @@
-% Author: Matthew Frehlich, Ye Mei, Luis Garcia Dominguez,Faranak Farzan
-% 2016
+% Author: Matthew Frehlich, Ye Mei, Luis Garcia Dominguez, Faranak Farzan
+%         2016
+%         Ben Schwartzmann 
+%         2017
 
 % tmseeg_rm_ch_tr_1() - displays epoched TMSEEG data, allowing
 % user adjustment of TMS Pulse removal with sliders denoting removal times.
-%  Supports the single pulse and double pulse paradigms.
+% Supports the single pulse and double pulse paradigms.
 % 
-% inputs:   A  - parent GUI structure (renamed from S to avoid conflict
-% with S structure of tmseeg_rm_ch_tr_1
+% Inputs:   A        - parent GUI structure
 %           step_num - step of tmseeg_rm_ch_tr_1 in workflow
 
 % Display window interface:
@@ -36,17 +37,13 @@
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
-%
-%
-% Updated on Dec 2017 by Ben Schwartzmann 
-% Plot Channels is now faster 
-% Get_SM returns correct attribute now
 
 
 function  tmseeg_rm_ch_tr_1(A, step_num)
 
-if tmseeg_previous_step(step_num) %added by Ben Schwartzmann
-    return %if cant load previous steps current step is aborted
+%Check if previous steps were done
+if tmseeg_previous_step(step_num)
+    return
 end
 
 global basepath dotcolor linecolor backcolor VARS
@@ -125,11 +122,10 @@ S.step_num = step_num;
 [~,name,~]          = fileparts(file.name); 
 S.name              = name;
 
-
 if ~exist(fullfile(basepath,[name '_' num2str(S.step_num) '_toDelete.mat']),'file')
     S.toDelete = [];
 else
-    load(fullfile(basepath,[name '_' num2str(S.step_num) '_toDelete.mat']));
+    load(fullfile(basepath,[name '_' num2str(S.step_num) '_toDelete.mat'])); %#ok
     S.toDelete = toDelete;
 end
 
@@ -137,11 +133,8 @@ end
 VARS.NUM_BAD_CHANS  = ceil(EEG.nbchan*VARS.PCT_BAD_CHANS/100);
 VARS.NUM_BAD_TRIALS = ceil(EEG.trials*VARS.PCT_BAD_TRIALS/100);
 
-
-
 % Update GUI
 guidata(S.fh,S);
-
 
 end
 
@@ -276,7 +269,7 @@ guidata(S.fh,S);
 
 S.x         = linspace(0.1,1.9,S.EEG.trials);
 evalin('base', 'global TMPREJ');
-[~,IX] = sort(mean(S.M),'descend'); %Sort by attribute!!!!!
+[~,IX] = sort(mean(S.M),'descend'); %#ok %Sort by attribute!!!!!
 % data = S.EEG.data(:,:,IX); 
 data = S.EEG.data;
 eegplot(data,'spacing',100,'srate',S.EEG.srate,'limits',S.EEG.times([1 end]),...
@@ -307,51 +300,63 @@ S = guidata(varargin{1});
 [~,name,~] = fileparts(files.name); 
 
 toDelete=[];
-if exist(fullfile(basepath,[name '_' num2str(S.step_num) '_toDelete.mat']),'file')
-        load(fullfile(basepath,[name '_' num2str(S.step_num) '_toDelete.mat']));
-end
 
+if exist(fullfile(basepath,[name '_' num2str(S.step_num) '_toDelete.mat']),'file')
+        load(fullfile(basepath,[name '_' num2str(S.step_num) '_toDelete.mat'])); %#ok
+end
 
 % Create Image of Deletion Matrix
 image=zeros(EEG.nbchan,EEG.trials);
+
 if ~isempty(toDelete)
+    
     for k=1:size(toDelete,1)
         ch = toDelete(k,2);
         tr = toDelete(k,1);%% column2 channel column1 trial
+        
         if (ch*tr)==0
+            
             if ch==0
                 image(:,tr)=1;
             end
+            
             if tr==0
                 image(ch,:)=1;
             end
+            
         else
             image(ch,tr) = 1; 
         end
+        
     end
+    
 end
 
 figure('menubar','none','Toolbar','none','color',backcolor);
 imagesc(image);
-xlabel('Trial')
-ylabel('Channel')
-title('Deletion Matrix (Yellow = marked for deletion)')
+xlabel('Trial');
+ylabel('Channel');
+title('Deletion Matrix (Yellow = marked for deletion)');
+
 end
 
 %Clear Deletion Matrix
 function [] = pb_clear_call(varargin)
 global basepath
-S        = varargin{3};
-S        = guidata(S.fh);
+S = varargin{3};
+S = guidata(S.fh);
     if ~isempty(S.name)
     button = questdlg('Clear Current Subject?','Clear Subject');
+    
         if isequal(button,'Yes')
            S.toDelete = [];
            guidata(S.fh,S);
            toDelete        = S.toDelete; %#ok
            save(fullfile(basepath,[S.name '_' num2str(S.step_num) '_toDelete.mat']), 'toDelete');
         end
+        
     end
+    
 end
 
 %Delete Selected Trials
@@ -359,6 +364,7 @@ function [] = pb_del_tr_ch_call(varargin)
 % Calls tmseeg_rm_tagged_elements with the toDelete matrix to remove marked
 % channels and trials.  Saves cleaned dataset, toDelete matrix and updates
 % parent display
+
 global basepath
 S        = varargin{3};
 S        = guidata(S.fh);
@@ -366,31 +372,33 @@ A        = varargin{4};
 [files, EEG] = tmseeg_load_step(S.step_num);
 EEG.nbchan_o = EEG.nbchan;
 EEG.trials_o = EEG.trials;
+
 try
+    
     if exist([basepath '\' S.name '_' num2str(S.step_num) '_toDelete.mat'],'file')
-        load(fullfile(basepath,[S.name '_' num2str(S.step_num) '_toDelete.mat']));
+        load(fullfile(basepath,[S.name '_' num2str(S.step_num) '_toDelete.mat'])); %#ok
     else
         toDelete = [];
     end
-[EEG, GC, GT] = tmseeg_rm_tagged_elements(EEG,toDelete);
-EEG                = eeg_checkset( EEG );
-tmseeg_step_check(files, EEG, A, S.step_num)
-save(fullfile(basepath,[S.name '_' num2str(S.step_num) '_toDelete.mat']), 'toDelete');
+    
+    [EEG, GC, GT] = tmseeg_rm_tagged_elements(EEG,toDelete); %#ok
+    EEG = eeg_checkset(EEG);
+    tmseeg_step_check(files, EEG, A, S.step_num)
+    save(fullfile(basepath,[S.name '_' num2str(S.step_num) '_toDelete.mat']), 'toDelete');
 
-close
-tmseeg_clear_figs()
+    close;
+    tmseeg_clear_figs();
 catch
     error('Could not delete selected data')
 end
-
 
 end
 
 %------------------------------Helper Functions----------------------------
 
-
 %Select Window Callback
 function ClickOnWindow(varargin)
+
 global points backcolor dotcolor colorsDot
 % Called by Plot Channels GUI when window is selected
 S       = varargin{3};
@@ -443,6 +451,7 @@ trial = get_trial(S);
 S.trial = trial;
 guidata(S.fh,S);
 tmseeg_plot_trial(S);
+
 end
 
 
@@ -467,8 +476,8 @@ p_end = find(EEG.times<VARS.PULSE_END,1,'last');
 %Filter Design
 Fs=EEG.srate;
 ord = 2;
-[z1, p1, k1]      = butter(ord,[VARS.FREQ_MIN VARS.FREQ_MAX]/(Fs/2),'bandpass');
-[xall1,yall2]   = zp2sos(z1,p1,k1);
+[z1, p1, k1] = butter(ord,[VARS.FREQ_MIN VARS.FREQ_MAX]/(Fs/2),'bandpass');
+[xall1,yall2] = zp2sos(z1,p1,k1);
 
 switch get(findobj('tag','vv'),'value')
    case 1
@@ -490,6 +499,7 @@ switch get(findobj('tag','vv'),'value')
             SM(:,trl) = log(sum(abs(diff(EEG_filt,1,1)'),2));
         end
 end
+
 SM = SM*(N/(max(SM(:))-min(SM(:)))) - min(SM(:));
 
 end

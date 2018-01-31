@@ -87,8 +87,6 @@ INIT_VARS.PLT_CHN_YMAX_2   = 400;
 %Vew Data
 INIT_VARS.YSHOWLIMIT = 100;
 
-
-
 end
 
 

@@ -222,7 +222,7 @@ end
 EEG.comp2rem = I(cmp);
 EEG.comptype = comptype;
 ICA2comp     = comptype;
-displ_comp(comptype,I)
+tmseeg_displ_comp(comptype,I)
 EEG_O = EEG;
 EEG          = pop_subcomp(EEG,EEG.comp2rem,0); 
 EEG          = eeg_checkset( EEG );

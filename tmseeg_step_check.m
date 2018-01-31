@@ -2,9 +2,6 @@ function  tmseeg_step_check(files, EEG, S, step_num)
 % tmseeg_reset_workflow() - resets the workflow by deleting future
 % sequential steps starting from a specified step.  Updates the parent GUI
 % to reflect the deleted files.
-%
-% Updated on Nov 2017 by Ben Schwartzmann
-% Make it compatible with Linux and Mac
 
 global basepath
 [~,name,ext] = fileparts(files.name);
