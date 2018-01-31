@@ -14,13 +14,13 @@ for i = 1:tostep
         delete(filetodelete);
         delete([basepath '/*' basefile checkext '_toDelete.mat']);
         delete([basepath '/*' basefile checkext '_ICA2comp.mat']);
-        delete([basepath '/*' basefile '_ERP_settings.mat']);
+        delete([basepath '/*' basefile '_tmseeg_settings.mat']);
     end    
 tmseeg_upd_stp_disp(S, ext, tostep)
 end
 
-if exist([basepath '/*' basefile '_ERP_settings.mat'],'file')
-    delete([basepath '/*' basefile '_ERP_settings.mat'])
+if exist([basepath '/*' basefile '_tmseeg_settings.mat'],'file')
+    delete([basepath '/*' basefile '_tmseeg_settings.mat'])
 end
 
 end

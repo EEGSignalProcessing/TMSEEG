@@ -18,6 +18,11 @@
 
 function []=tmseeg_show(afterstep)
 
+%Check if previous step was done
+if tmseeg_previous_step(afterstep+1)
+    return
+end
+
 global hfinalax hzoom xshowmin xshowmax yshowlimit backcolor VARS
 
 hfig = figure('Units','normalized',...
