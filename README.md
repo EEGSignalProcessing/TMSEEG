@@ -30,7 +30,7 @@ MAINTAINER
 --------------
 
 Current Maintainers: 
-* Faranak Farzan
+* Matthew Frehlichx 
 * Sravya Atluri
 
 REPOSITORY WORKFLOW
@@ -42,10 +42,10 @@ We follow the GitHub workflow guidelines summarized by [Ben Sandofsky](https://s
 GETTING STARTED
 --------------
 
-Visit the [wiki page](https://github.com/cogsmac/TMSEEG/wiki/Getting-Started) for links to [sample data sets](http://www.tmseeg.com/wp-content/uploads/2016/05/SampleData.zip) and the [offical tutorial](http://www.tmseeg.com/tutorials/). A couple main things to keep in mind  
+Visit the [wiki page](https://github.com/cogsmac/TMSEEG/wiki/Getting-Started) for links to [sample data sets](http://www.tmseeg.com/wp-content/uploads/2016/05/SampleData.zip) and the [offical tutorial](http://www.tmseeg.com/wp-content/uploads/2016/05/TMSEEG-Tutorial-v3.pdf). A couple main things to keep in mind  
 
 1) TMSEEG toolbox requires [EEGLAB](https://sccn.ucsd.edu/eeglab/downloadtoolbox.php) to be installed
 2) MATLAB is picky about [paths](http://www.mathworks.com/help/matlab/ref/path.html?s_tid=gn_loc_drop). After download, pay attention to how the paths are set as indicated by the tutorial and documentation. If you receive an error that a file is missing it is probably because either the dependencies are not installed or because the paths are not set correctly
-3) If you don't want to install Git on your machine, you may download a .zip file of this whole repository. Check which version of MATLAB you're using. If it's 2016 or newer, use this home repository. If it's older than that, click to select the TMSEEG2014 branch. To download a .zip, click the "clone or download" button on the [home page](https://github.com/cogsmac/TMSEEG) for this project. Extract the .zip file in a directory that is on your MATLAB path (for example, on a PC C:\Users\cogsmac\Documents\MATLAB or on a MAC ~/Documents/MATLAB). 
+3) If you don't want to install Git on your machine, you may download a .zip file of this whole repository. To download a .zip, clock the "clone or download" button on the [home page](https://github.com/cogsmac/TMSEEG) for this project. Extract the .zip file in a directory that is on your MATLAB path (for example, on a PC C:\Users\cogsmac\Documents\MATLAB or on a MAC ~/Documents/MATLAB). 
 4) You'll also need to download [FastICA](http://www.cis.hut.fi/projects/ica/fastica/) and have it on your path for the TMSEEG toolbox to work as is
-5) Once you've downloaded everything and have your paths set, open MATLAB to the folder containing TMSEEG and simply doubleclick TMSEEG.mlappinstall (for the 2016+ version) 
+5) Once you've downloaded everything and have your paths set, open MATLAB to the folder containing TMSEEG and simply  a) on a PC, doubleclick TMSEEG.mlappinstall or b) on a Mac, type tmseeg_v30_macApp.m into MATLAB's command window.
