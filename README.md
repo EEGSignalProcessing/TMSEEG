@@ -3,14 +3,11 @@ An online repository of the TMSEEG toolbox (http://www.tmseeg.com)
 
 INTRODUCTION
 -------------------
-TMSEEG is a Matlab App designed for streamlined processing of EEG data 
-collected during TMS application.  Processing steps are presented using a
-GUI format with modularity.  
+TMSEEG is a Matlab App designed for streamlined processing of EEG data collected during TMS application. Processing steps are presented using a GUI format with modularity.  
 
 REQUIREMENTS
 --------------------
-TMSEEG was built on MATLAB v2013a, with use of EEGLAB v12.0.2.6b. Both
-EEGLAB and MATLAB support backward compatibility with more recent releases.
+TMSEEG was built originally on MATLAB 2013a, with use of EEGLAB v12.0.2.6b. This updated version is re-packaged using MATLAB 2017b and EEGLAB v14.1.1b. This updated version requires MATLAB (2013a or later version) and EEGLAB v14.1.1b.
 
 * MATLAB  - http://www.mathworks.com/products/matlab/
 * EEGLAB  - http://sccn.ucsd.edu/eeglab/downloadtoolbox.php
@@ -20,8 +17,7 @@ EEGLAB and MATLAB support backward compatibility with more recent releases.
 INSTALLATION
 ---------------------
 
-TMSEEG is packages as a MATLAB App for easy installation. For further 
-instruction: 
+TMSEEG is packages as a MATLAB App for easy installation. For further instruction: 
 http://www.mathworks.com/videos/packaging-and-installing-matlab-apps-70404.html
 
 * Ensure that the MATLAB signal processing toolkit has path priority
