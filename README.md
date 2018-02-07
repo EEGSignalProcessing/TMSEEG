@@ -3,7 +3,8 @@ An online repository of the TMSEEG toolbox (http://www.tmseeg.com)
 
 INTRODUCTION
 -------------------
-TMSEEG is a Matlab App designed for streamlined processing of EEG data collected during TMS application. Processing steps are presented using a GUI format with modularity.  
+TMSEEG is a Matlab App designed for streamlined processing of EEG data collected during TMS application. 
+Processing steps are presented using a GUI format with modularity.  
 
 REQUIREMENTS
 --------------------
