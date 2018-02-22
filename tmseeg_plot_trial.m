@@ -102,8 +102,10 @@ S = guidata(S.fh);
 tline = findobj(gca,'type','line');
 BC = flipud(cell2mat(get(tline,'linewidth'))==3 & ismember(get(tline,'hittest'),'on'));
 
-if isprop(S.ft,'Position')
-    points = flipud(findobj(get(S.ft,'Children'),'type','scatter'));
+if isfield(S,'ft')
+    if isprop(S.ft,'Position')
+        points = flipud(findobj(get(S.ft,'Children'),'type','scatter'));
+    end
 end
 
 if any(BC) %If lines selected, delete those lines
@@ -225,9 +227,11 @@ for k = setdiff(1:S.EEG.nbchan,find(ismember(cell2mat(get(S.sp,'Color')),[.5 .5 
     set(p,'CData',colorsDot(:,:,k));
 end
 
-if isprop(S.ft,'Position')
-    points=flipud(findobj(get(S.ft,'Children'),'type','scatter'));
-    set(points,'CData',colorsDot(:,:,S.ch));
+if isfield(S,'ft')
+    if isprop(S.ft,'Position')
+        points=flipud(findobj(get(S.ft,'Children'),'type','scatter'));
+        set(points,'CData',colorsDot(:,:,S.ch));
+    end
 end
 
 end
