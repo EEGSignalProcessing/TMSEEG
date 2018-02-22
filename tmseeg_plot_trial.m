@@ -101,7 +101,10 @@ S = varargin{3};
 S = guidata(S.fh);
 tline = findobj(gca,'type','line');
 BC = flipud(cell2mat(get(tline,'linewidth'))==3 & ismember(get(tline,'hittest'),'on'));
-points = flipud(findobj(get(S.ft,'Children'),'type','scatter'));
+
+if isprop(S.ft,'Position')
+    points = flipud(findobj(get(S.ft,'Children'),'type','scatter'));
+end
 
 if any(BC) %If lines selected, delete those lines
     choice = questdlg('Delete Selected Channels in Trial?');
@@ -222,8 +225,10 @@ for k = setdiff(1:S.EEG.nbchan,find(ismember(cell2mat(get(S.sp,'Color')),[.5 .5 
     set(p,'CData',colorsDot(:,:,k));
 end
 
-points=flipud(findobj(get(S.ft,'Children'),'type','scatter'));
-set(points,'CData',colorsDot(:,:,S.ch));
+if isprop(S.ft,'Position')
+    points=flipud(findobj(get(S.ft,'Children'),'type','scatter'));
+    set(points,'CData',colorsDot(:,:,S.ch));
+end
 
 end
 

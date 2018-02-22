@@ -37,7 +37,7 @@ files   = dir(fullfile(basepath,[basefile '.set']));
 
 % added July 2017 to work cross platform; special case for Macs to find
 % appropriate eeglab installation. -C.M.
-if contains(computer, 'MAC')
+if strfind(computer, 'MAC')
     [~, findEEGLab] = system('find ~/ -name eeglab.m'); % find eeglab.m instances
     cellDirs       = strsplit(findEEGLab); % split output into functional cells
     containsApps   = strfind(cellDirs, '/Apps/'); % discern instance of eeglab in "Apps"
