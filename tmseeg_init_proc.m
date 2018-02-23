@@ -37,7 +37,7 @@ files   = dir(fullfile(basepath,[basefile '.set']));
 
 % added July 2017 to work cross platform; special case for Macs to find
 % appropriate eeglab installation. -C.M.
-if strfind(computer, 'MAC')
+if ~isempty(strfind(computer, 'MAC')) || ~isempty(strfind(computer, 'GLNX'))
     [~, findEEGLab] = system('find ~/ -name eeglab.m'); % find eeglab.m instances
     cellDirs       = strsplit(findEEGLab); % split output into functional cells
     containsApps   = strfind(cellDirs, '/Apps/'); % discern instance of eeglab in "Apps"
@@ -47,7 +47,7 @@ if strfind(computer, 'MAC')
    
     gotoDir = strrep(gotoDir, 'eeglab.m', '');
     addpath(genpath(gotoDir)) % add eeglab files to path
-    eval(['cd ' gotoDir]) % change into eeglab directory
+%     eval(['cd ' gotoDir]) % change into eeglab directory
 end
 
 EEG = pop_loadset('filename',[basefile '.set'],'filepath',basepath);
