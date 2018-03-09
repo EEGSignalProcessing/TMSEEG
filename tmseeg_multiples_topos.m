@@ -32,7 +32,7 @@
 % GNU General Public License for more details.
 
 function tmseeg_multiples_topos(EEG,name,A,step_num)
-global I comptype backcolor VARS
+global I comptype backcolor VARS chans_rm
 S.topos = figure('menubar','none',...
               'Toolbar','none',...
               'Units','normalized',...
@@ -59,7 +59,8 @@ n       = find(fact(:,3)>=N,1,'first');
 %-----------------kurtosis-based estimation of Electrode artifacts---------
 kthre   = VARS.KURTOSIS_THRESH;
 t       = EEG.times>0 & EEG.times<1000;
-EEGdata = EEG.data(:,t,:);
+EEGdata = EEG.data(setdiff(1:EEG.nbchan,chans_rm),t,:);
+
 
 a = icavar(EEGdata(:,:),EEG.icaweights,EEG.icasphere,0);
 a = reshape(a,[N size(EEGdata,2) size(EEG.data,3)]);
@@ -72,16 +73,43 @@ if ~isfield(EEG,'comptype')
     kurt    = kurtosis(EEG.icawinv);
     kurt    = kurt(I)>kthre;
 end
+%----------------------------EMG artifact estimation-----------------------
 
+comp_count_eeg = 1;
+freq_matrix = zeros(length(comptype),2);
+for j = 1:length(comptype)
+        icaacttmp = (EEG.icaweights(I(j),:)*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts);
+        [spectra, freqs] = spectopo( icaacttmp, EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,I(j)), 'freqrange', [2 50],'plot','off' );
+       
+        spectra_abs = db2pow(spectra);
+        range = find(freqs < 50);
+        low_range = find(freqs < 10 & freqs > 0);
+        high_range = find(freqs < 50 & freqs > 30);
+        for k = range
+            spectra_abs(1,k) = spectra_abs(1,k)/(squeeze(sum(spectra_abs(1,range))));
+        end
+%         spectra_db = pow2db(spectra_abs);
+        freq_matrix(j,1) = sum(spectra_abs(1,low_range))/length(low_range);
+        freq_matrix(j,2) = sum(spectra_abs(1,high_range))/length(high_range);
+       
+        comp_count_eeg = comp_count_eeg + 1;
+        clear icaacttmp spectra freqs p
+end
+
+emg_ratio = freq_matrix(:,2)./freq_matrix(:,1);
+emg_thresh = 1.1;
+emg_tag = emg_ratio > emg_thresh;
 %--------------------Plotting the subplot,labels,buttons-------------------
 
 for k = 1:size(EEG.icawinv,2)
     if isfield(EEG,'comptype') && EEG.comptype(I(k))>0
         type = label{EEG.comptype(I(k))};
+    elseif ~isfield(EEG,'comptype') && emg_tag(k)
+        type = label{3};
+        comptype(I(k))=3;
     elseif ~isfield(EEG,'comptype') && kurt(k)
-%         type = 'Elect';
-%         comptype(I(k))=5;
-        type = '';
+        type = label{5};
+        comptype(I(k))=5;
     else
         type = '';
     end
@@ -94,7 +122,7 @@ for k = 1:size(EEG.icawinv,2)
         'Tag',num2str(k),'value',0,'callback',@place_dot); %'value',kurt(k)
     if isfield(EEG,'comptype') && EEG.comptype(I(k))>0
         set(icad(k).rb,'value',1)
-    elseif comptype(I(k))== 5
+    elseif comptype(I(k))== 5 || comptype(I(k))== 3
         set(icad(k).rb,'value',1)
     end
     
@@ -106,9 +134,8 @@ for k = 1:size(EEG.icawinv,2)
     tag = ['ICA ' num2str(I(k)) ];
     icad(k).tg = uicontrol(gcf,'style','text','units','normalized','Position', [p(1)+0.017 p(2) + (p(4) + 0.023) 0.038 0.022],...
         'Tag',num2str(k),'String',tag);
-    text
-    
-    topoplot(EEG.icawinv(:,I(k)),EEG.chanlocs); %Ch Subplot to blank topography plot
+        
+    topoplot(EEG.icawinv(:,I(k)),EEG.chanlocs(setdiff(1:EEG.nbchan,chans_rm)),'colormap',colormap(jet)); %Ch Subplot to blank topography plot
     set(icad(k).pb,'callback',{@disp_call, EEG,icad(k)}) % Setting callback for push button
     
     
@@ -163,7 +190,7 @@ end
 function [] = save_call(varargin)
 %Saves and removes components set for removal by the user
 
-global I comptype basepath existcolor
+global I comptype basepath existcolor chans_rm
 EEG      = varargin{3};
 name     = varargin{4};
 A        = varargin{5};
@@ -184,9 +211,30 @@ end
 %Save and remove components
 EEG.comp2rem = I(cmp);
 EEG.comptype = comptype;
-EEG         = pop_subcomp(EEG,EEG.comp2rem,0); 
+EEG.ref;
+for i = 1:EEG.nbchan
+    EEG.chanlocs(i).labels;
+end
+
+EEG_O = EEG;
+EEG_ica = EEG;
+EEG_ica.nbchan=EEG.nbchan-length(chans_rm);
+EEG_ica.data=EEG.data(setdiff(1:EEG.nbchan,chans_rm),:,:);
+EEG_ica.chanlocs=EEG.chanlocs(setdiff(1:EEG.nbchan,chans_rm));
+EEG_ica          = pop_subcomp(EEG_ica,EEG.comp2rem,0); 
+EEG=EEG_ica;
+EEG.data=EEG_O.data;
+EEG.chanlocs=EEG_O.chanlocs;
+EEG.nbchan=EEG_O.nbchan;
+EEG.data(setdiff(1:EEG.nbchan,chans_rm),:,:)=EEG_ica.data;
+
+EEG          = eeg_checkset( EEG );
+
+
+% EEG         = pop_subcomp(EEG,EEG.comp2rem,0); 
 EEG          = eeg_checkset( EEG );
 ICA2comp = comptype;
+
 %Save data, update main GUI
 [files, ~] = tmseeg_load_step(step_num);
 tmseeg_step_check(files, EEG, A, step_num)
@@ -201,7 +249,7 @@ end
 function [] = update_call(varargin)
 %Displays the EEG dataset with selected components removed
 
-global I comptype basepath existcolor VARS
+global I comptype basepath existcolor VARS chans_rm
 EEG    = varargin{3};
 name   = varargin{4};
 A      = varargin{5};
@@ -224,8 +272,19 @@ EEG.comptype = comptype;
 ICA2comp     = comptype;
 tmseeg_displ_comp(comptype,I)
 EEG_O = EEG;
-EEG          = pop_subcomp(EEG,EEG.comp2rem,0); 
-EEG          = eeg_checkset( EEG );
+EEG_ica = EEG;
+EEG_ica.nbchan=EEG.nbchan-length(chans_rm);
+EEG_ica.data=EEG.data(setdiff(1:EEG.nbchan,chans_rm),:,:);
+EEG_ica.chanlocs=EEG.chanlocs(setdiff(1:EEG.nbchan,chans_rm));
+EEG_ica = pop_subcomp(EEG_ica,EEG.comp2rem,0); 
+EEG=EEG_ica;
+EEG.data=EEG_O.data;
+EEG.chanlocs=EEG_O.chanlocs;
+EEG.nbchan=EEG_O.nbchan;
+EEG.data(setdiff(1:EEG.nbchan,chans_rm),:,:)=EEG_ica.data;
+% EEG          = pop_subcomp(EEG,EEG.comp2rem,0); 
+EEG = eeg_checkset( EEG );
+
 wdw_start = VARS.UPD_WDW_STRT;
 wdw_end   = VARS.UPD_WDW_END;
 
@@ -236,24 +295,24 @@ close(findobj('type','figure','name','After ICA 2 Component Removal'))
 data_temp = squeeze(nanmean(EEG.data,3));
 data_orig_temp = squeeze(nanmean(EEG_O.data,3));
 
-% Double pulse paradigm case
-if(isfield(EEG,{'TMS_period2remove_b'}))
-    ix = min(EEG.TMS_period2remove_b);
-    rm_pulse_fill = NaN(size(data_temp,1),length(EEG.TMS_period2remove_b));
-    data_temp = cat(2,data_temp(:,1:ix-1),rm_pulse_fill,data_temp(:,ix:end));
-    
-    rm_pulse_fill_orig = NaN(size(data_temp,1),length(EEG.TMS_period2remove_b));
-    data_orig_temp = cat(2,data_orig_temp(:,1:ix-1),rm_pulse_fill_orig,data_orig_temp(:,ix:end));
-end
+% % Double pulse paradigm case
+% if(isfield(EEG,{'TMS_period2remove_b'}))
+%     ix = min(EEG.TMS_period2remove_b);
+%     rm_pulse_fill = NaN(size(data_temp,1),length(EEG.TMS_period2remove_b));
+%     data_temp = cat(2,data_temp(:,1:ix-1),rm_pulse_fill,data_temp(:,ix:end));
+%     
+%     rm_pulse_fill_orig = NaN(size(data_temp,1),length(EEG.TMS_period2remove_b));
+%     data_orig_temp = cat(2,data_orig_temp(:,1:ix-1),rm_pulse_fill_orig,data_orig_temp(:,ix:end));
+% end
 
 %Insert NaN values to fill space where TMS pulse was removed
-ix       = min(EEG.TMS_period2remove_1);
-rm_pulse_fill = NaN(size(data_temp,1),length(EEG.TMS_period2remove_1));
-data_temp = cat(2,data_temp(:,1:ix-1),rm_pulse_fill,data_temp(:,ix:end));
-
-rm_pulse_fill_orig = NaN(size(data_orig_temp,1),length(EEG.TMS_period2remove_1));
-data_orig_temp = cat(2,data_orig_temp(:,1:ix-1),rm_pulse_fill_orig,data_orig_temp(:,ix:end));
-
+% ix       = min(EEG.TMS_period2remove_1);
+% rm_pulse_fill = NaN(size(data_temp,1),length(EEG.TMS_period2remove_1));
+% data_temp = cat(2,data_temp(:,1:ix-1),rm_pulse_fill,data_temp(:,ix:end));
+% 
+% rm_pulse_fill_orig = NaN(size(data_orig_temp,1),length(EEG.TMS_period2remove_1));
+% data_orig_temp = cat(2,data_orig_temp(:,1:ix-1),rm_pulse_fill_orig,data_orig_temp(:,ix:end));
+% 
 ymin = VARS.UPD_WDW_YMIN;
 ymax = VARS.UPD_WDW_YMAX;
 EEGtimes    =  min(EEG.times):1000/EEG.srate:max(EEG.times);

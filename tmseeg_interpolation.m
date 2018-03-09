@@ -41,11 +41,20 @@ end
 
 EEG.channels_interpolated = find(badchan);
 EEG = eeg_checkset(EEG);
-EEG = pop_reref(EEG, []);
+
+re_ref = questdlg('Re-reference to average?');
+if strcmp(re_ref,'Yes')
+    EEG = pop_reref(EEG, []);
+    EEG = eeg_checkset( EEG );
+end
 
 %Add back removed time segment
-EpochSecs = EEG.epoch_length;
-EEG = tmseeg_addTMSTimeBack(EEG, EpochSecs); 
+add_buffer = questdlg(strcat(['Add buffer time to for time periods deleted in step ' num2str(ind) '?']));
+    if strcmp(add_buffer,'Yes')
+        EpochSecs = EEG.epoch_length;
+        EEG = tmseeg_addTMSTimeBack(EEG, EpochSecs); 
+    end
+    
 save(fullfile(basepath,[basefile '_tmseeg_settings.mat']), 'VARS');
 tmseeg_step_check(files, EEG, S, step_num)
 

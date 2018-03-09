@@ -15,6 +15,7 @@ for i = 1:tostep
         delete(filetodelete);
         delete([basepath '/*' basefile checkext '_toDelete.mat']);
         delete([basepath '/*' basefile checkext '_ICA2comp.mat']);
+        delete([basepath '/*' basefile checkext '_ICA2chansUnsel.mat']);
     end 
     
 tmseeg_upd_stp_disp(S, ext, tostep)

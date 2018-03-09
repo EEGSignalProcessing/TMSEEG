@@ -235,11 +235,11 @@ end;
     return
   end;
 
-  if datasets>MAXPLOTDATAEPOCHS 
-      fprintf('plottopo: not set up to plot more than %d epochs.\n',...
-                       MAXPLOTDATAEPOCHS);
-    return
-  end;
+%   if datasets>MAXPLOTDATAEPOCHS 
+%       fprintf('plottopo: not set up to plot more than %d epochs.\n',...
+%                        MAXPLOTDATAEPOCHS);
+%     return
+%   end;
   if datasets<1
       fprintf('plottopo: cannot plot less than 1 epoch!\n');
       return

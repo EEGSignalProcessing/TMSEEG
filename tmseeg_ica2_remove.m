@@ -29,6 +29,7 @@ end
 
 global basepath
 global comptype
+global chans_rm
 
 %Load Data
 [files, EEG] = tmseeg_load_step(step_num);
@@ -41,6 +42,13 @@ if exist(fullfile(basepath,[name '_' num2str(step_num) '_ICA2comp.mat']),'file')
     EEG.comptype = comptype;
 else
     comptype = zeros(1,size(EEG.icawinv,2));
+end
+
+%Check for existing ICA channels removed
+if exist(fullfile(basepath,[name '_ICA2chansUnsel.mat']),'file')
+    load(fullfile(basepath,[name '_ICA2chansUnsel.mat'])); 
+else
+    chans_rm = [];
 end
 
 tmseeg_multiples_topos(EEG,name, S, step_num);
