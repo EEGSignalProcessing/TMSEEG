@@ -375,8 +375,6 @@ S        = varargin{3};
 S        = guidata(S.fh);
 A        = varargin{4};
 [files, EEG] = tmseeg_load_step(S.step_num);
-EEG.nbchan_o = EEG.nbchan;
-EEG.trials_o = EEG.trials;
 
 try
     
