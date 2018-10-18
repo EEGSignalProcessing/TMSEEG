@@ -211,7 +211,7 @@ if strcmp(baseline,'Yes') %Choose to resample
     if isempty(answer) %User enters a resampling value
         
         try
-            VARS.BASELINE_RNG = str2double(answer{1});
+            VARS.BASELINE_RNG = str2num(answer{1});
             EEG               = pop_rmbase(EEG, VARS.BASELINE_RNG); 
         catch
             error('Could not baseline data with given settings')

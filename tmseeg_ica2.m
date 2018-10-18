@@ -33,7 +33,7 @@ end
 global basepath VARS chans_rm
 
 %Data Load
-[files, EEG] = eegdatapro_load_step(step_num);
+[files, EEG] = tmseeg_load_step(step_num);
 [~,name,~]          = fileparts(files.name); 
 S.name              = name;
 
