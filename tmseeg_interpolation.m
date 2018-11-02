@@ -49,7 +49,7 @@ if strcmp(re_ref,'Yes')
 end
 
 %Add back removed time segment
-add_buffer = questdlg(strcat(['Add buffer time to for time periods deleted in step ' num2str(ind) '?']));
+add_buffer = questdlg(strcat(['Add buffer time to for time periods deleted in step 2?']));
     if strcmp(add_buffer,'Yes')
         EpochSecs = EEG.epoch_length;
         EEG = tmseeg_addTMSTimeBack(EEG, EpochSecs); 
