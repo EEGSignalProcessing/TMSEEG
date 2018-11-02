@@ -1,0 +1,132 @@
+<deployment-project plugin="plugin.apptool" plugin-version="1.0">
+  <configuration build-checksum="847873161" file="C:\Users\bjmsc\Documents\MATLAB\TMSEEG\TMSEEG-4.0\tmseeg_v4.0.prj" location="C:\Users\bjmsc\Documents\MATLAB\TMSEEG\TMSEEG-4.0" name="tmseeg_v4.0" target="target.mlapps" target-name="Package App">
+    <param.appname>tmseeg_v4.0</param.appname>
+    <param.authnamewatermark />
+    <param.email />
+    <param.company />
+    <param.icon />
+    <param.icons />
+    <param.summary />
+    <param.description />
+    <param.screenshot />
+    <param.version>4.0</param.version>
+    <param.products.name>
+      <item>MATLAB</item>
+      <item>Signal Processing Toolbox</item>
+      <item>Statistics and Machine Learning Toolbox</item>
+    </param.products.name>
+    <param.products.id>
+      <item>1</item>
+      <item>8</item>
+      <item>19</item>
+    </param.products.id>
+    <param.products.version>
+      <item>9.0</item>
+      <item>7.2</item>
+      <item>10.2</item>
+    </param.products.version>
+    <param.platforms />
+    <param.output>C:\Users\bjmsc\Documents\MATLAB\TMSEEG\TMSEEG-4.0</param.output>
+    <param.guid>7e732a35-d992-4958-b641-29819d188bcc</param.guid>
+    <unset>
+      <param.authnamewatermark />
+      <param.email />
+      <param.company />
+      <param.icon />
+      <param.icons />
+      <param.summary />
+      <param.description />
+      <param.screenshot />
+      <param.platforms />
+      <param.output />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}\tmseeg_main.m</file>
+    </fileset.main>
+    <fileset.depfun>
+      <file>${PROJECT_ROOT}\tight_subplot.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_addTMSTimeBack.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_clear_figs.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_displ_comp.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_filt.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_ica1.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_ica2.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_ica2_remove.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_init.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_init_proc.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_interpolation.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_load_step.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_multiples_topos.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_plot_channel.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_plot_trial.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_plottopo.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_pop_prop_modified.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_previous_step.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_reset_workflow.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_rm_ch_tr_1.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_rm_ch_tr_2.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_rm_tagged_elements.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_rm_TMS_art.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_rm_TMS_decay.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_save_step.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_settings.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_show.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_step_check.m</file>
+      <file>${PROJECT_ROOT}\tmseeg_upd_stp_disp.m</file>
+    </fileset.depfun>
+    <fileset.resources>
+      <file>${PROJECT_ROOT}\LICENSE</file>
+      <file>${PROJECT_ROOT}\README.md</file>
+      <file>${PROJECT_ROOT}\standard-10-5-cap385.elp</file>
+    </fileset.resources>
+    <fileset.package />
+    <build-deliverables>
+      <file location="C:\Users\bjmsc\Documents\MATLAB\TMSEEG" name="TMSEEG-4.0" optional="false">C:\Users\bjmsc\Documents\MATLAB\TMSEEG\TMSEEG-4.0</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>C:\Program Files\MATLAB\R2016a</root>
+      <toolboxes>
+        <toolbox name="fixedpoint" />
+        <toolbox name="matlabcoder" />
+        <toolbox name="matlabhdlcoder" />
+        <toolbox name="embeddedcoder" />
+      </toolboxes>
+      <toolbox>
+        <fixedpoint>
+          <enabled>true</enabled>
+        </fixedpoint>
+      </toolbox>
+      <toolbox>
+        <matlabcoder>
+          <enabled>true</enabled>
+        </matlabcoder>
+      </toolbox>
+      <toolbox>
+        <matlabhdlcoder>
+          <enabled>true</enabled>
+        </matlabhdlcoder>
+      </toolbox>
+      <toolbox>
+        <embeddedcoder>
+          <enabled>true</enabled>
+        </embeddedcoder>
+      </toolbox>
+    </matlab>
+    <platform>
+      <unix>false</unix>
+      <mac>false</mac>
+      <windows>true</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>6.2</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>win64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>
