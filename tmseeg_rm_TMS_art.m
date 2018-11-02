@@ -342,6 +342,11 @@ else
         EEG                           = eeg_checkset(EEG); % some adjustments would be made
 end
 
+nevents = length(EEG.event);
+for index = 1 : nevents
+    EEG.event(index).latency=EEG.event(index).latency-(index-1)*length(period2remove);
+end
+
 tmseeg_step_check(files, EEG, A, step_num);
 
 end
