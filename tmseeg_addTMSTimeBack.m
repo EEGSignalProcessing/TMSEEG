@@ -65,5 +65,10 @@ EEG.data(:,w1+gap+1:EEG.pnts,:) = EEGkk.data(:,w2:EEGkk.pnts,:);
 EEG.data(:,w1+1:w1+gap,:) = NaN;
 EEG.times = floor(EEGkk.times(1)):(1000/EEGkk.srate):ceil(EEGkk.times(end));
     
+nevents = length(EEG.event);
+for index = 1 : nevents
+    EEG.event(index).latency=EEG.event(index).latency+(index-1)*gap;
+End
+
 end
 
