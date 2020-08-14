@@ -8,7 +8,7 @@ Processing steps are presented using a GUI format with modularity.
 
 REQUIREMENTS
 --------------------
-TMSEEG was built originally on MATLAB 2013a, with use of EEGLAB v12.0.2.6b. This updated version is re-packaged using MATLAB 2017b and EEGLAB v14.1.1b. This updated version requires MATLAB (2013a or later version) and EEGLAB v14.1.1b.
+TMSEEG was built originally on MATLAB 2013a, with use of EEGLAB v12.0.2.6b. This updated version is re-packaged using MATLAB 2020a and EEGLAB 2020. This updated version requires MATLAB (2020a or later version) and EEGLAB 2020.
 
 * MATLAB  - http://www.mathworks.com/products/matlab/
 * EEGLAB  - http://sccn.ucsd.edu/eeglab/downloadtoolbox.php
