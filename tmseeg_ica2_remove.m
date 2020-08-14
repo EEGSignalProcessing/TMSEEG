@@ -29,28 +29,20 @@ end
 
 global basepath
 global comptype
-global chans_rm
 
 %Load Data
 [files, EEG] = tmseeg_load_step(step_num);
 [~,name,~] = fileparts(files.name);
 
 %Check for existing ICA2 removal data
-if exist(fullfile(basepath,[name '_' num2str(step_num) '_ICA2comp.mat']),'file')
-    load(fullfile(basepath,[name '_' num2str(step_num) '_ICA2comp.mat'])); %#ok
+if exist(fullfile(basepath,[name '_' num2str(step_num) '_ICA2comp.mat']))
+    load(fullfile(basepath,[name '_' num2str(step_num) '_ICA2comp.mat']));
     comptype = ICA2comp;
     EEG.comptype = comptype;
 else
     comptype = zeros(1,size(EEG.icawinv,2));
 end
-
-%Check for existing ICA channels removed
-if exist(fullfile(basepath,[name '_ICA2chansUnsel.mat']),'file')
-    load(fullfile(basepath,[name '_ICA2chansUnsel.mat'])); 
-else
-    chans_rm = [];
-end
-
-tmseeg_multiples_topos(EEG,name, S, step_num);
+ 
+tmseeg_multiples_topos(EEG,name,S,step_num);
 
 end

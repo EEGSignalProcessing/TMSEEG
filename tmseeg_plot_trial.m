@@ -100,7 +100,7 @@ global dotcolor basepath colorsDot
 S = varargin{3};
 S = guidata(S.fh);
 tline = findobj(gca,'type','line');
-BC = flipud(cell2mat(get(tline,'linewidth'))==3 & ismember(get(tline,'hittest'),'on'));
+BC = flipud(cell2mat(get(tline,'linewidth'))==3);
 
 if isfield(S,'ft')
     if isprop(S.ft,'Position')
