@@ -250,9 +250,9 @@ end;
           axheight = gcapos(4)/(g.geom(1)+1);
           axwidth  = gcapos(3)/(g.geom(2)+1);
       end
-      % if chan_locs(2) > 5
-      %     axwidth = 0.66/(chan_locs(2)+1);
-      % end
+%       if chan_locs(2) > 5
+%           axwidth = 0.66/(chan_locs(2)+1);
+%       end
   else
       axheight = DEFAULT_AXHEIGHT;
       axwidth =  DEFAULT_AXWIDTH;
@@ -414,12 +414,13 @@ end;
         totalchans = floor(sqrt(totalchans))+1;
         for index = 1:length(emptychans)
             xvals(emptychans(index)) = 0.7+0.2*floor((index-1)/totalchans);
-            yvals(emptychans(index)) = -0.4+mod(index-1,totalchans)/totalchans;
+            yvals(emptychans(index)) = -0.4+mod(index-1,totalchans+4)/totalchans;
         end;
         g.channames = g.channames(g.chans,:);
         xvals     = xvals(g.chans);
         yvals     = yvals(g.chans);
     end
+
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % xvals = 0.5+PLOT_WIDTH*xvals;   % controls width of  plot array on page!
@@ -432,6 +433,7 @@ end;
                                                               % array on current axes
         end;
     end;
+    yvals = (yvals-mean([max(yvals) min(yvals)]))/(max(yvals)-min(yvals));
     yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot 
                                                       % array on current axes
                                                       %

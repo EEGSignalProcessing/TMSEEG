@@ -200,6 +200,7 @@ global VARS
 %Automatic baseline adjustment for changing epoch
 VARS.BASELINE_RNG = [0.8*VARS.EPCH_STRT (0 +0.2*VARS.EPCH_STRT) ];
 
+
 baseline = questdlg('Remove Baseline?');
 if strcmp(baseline,'Yes') %Choose to resample
     prompt = {'Baseline Calculation Range (ms)'};
@@ -208,10 +209,11 @@ if strcmp(baseline,'Yes') %Choose to resample
     defaultans = {num2str(VARS.BASELINE_RNG)};
     answer = inputdlg(prompt, dlg_title, num_lines, defaultans);
 
-    if isempty(answer) %User enters a resampling value
+    if ~isempty(answer) %User enters a resampling value
         
         try
             VARS.BASELINE_RNG = str2num(answer{1});
+            
             EEG               = pop_rmbase(EEG, VARS.BASELINE_RNG); 
         catch
             error('Could not baseline data with given settings')

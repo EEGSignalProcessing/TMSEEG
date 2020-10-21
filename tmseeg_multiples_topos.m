@@ -33,6 +33,7 @@
 
 function tmseeg_multiples_topos(EEG,name,A,step_num)
 global I comptype backcolor VARS chans_rm
+chans_rm=[];
 S.topos = figure('menubar','none',...
               'Toolbar','none',...
               'Units','normalized',...
@@ -73,6 +74,32 @@ if ~isfield(EEG,'comptype')
     kurt    = kurtosis(EEG.icawinv);
     kurt    = kurt(I)>kthre;
 end
+
+%----------------------------EOG artifact estimation-----------------------
+blink=zeros(1,size(EEG.icawinv,2));
+
+CBI=zeros(size(EEG.icawinv));
+
+for i=1:size(EEG.icawinv,1)
+    for j=1:size(EEG.icawinv,2)
+        CBI(i,j)=abs(EEG.icawinv(i,j))/sqrt(sum(EEG.icawinv(i,:).^2));
+    end
+end
+
+[px,py] = cart2sph([EEG.chanlocs.X],[EEG.chanlocs.Y],[EEG.chanlocs.Z]);
+theta = px/pi*180; % azimuth coordinate
+phi = py/pi*180; % polar coordinate
+frontalelec = (abs(theta) <= 30) & (abs(phi) <= 30);
+frontalelec2 = (abs(theta) <= 60) & (abs(theta) > 30) & (abs(phi) <= 30);
+
+%potential_blink
+[~,potential_blink]=max(sum(CBI(frontalelec,:)));
+
+%check with frontal activity
+feature = mean(abs(EEG.icawinv(frontalelec,potential_blink)))>mean(abs(EEG.icawinv(frontalelec2,potential_blink)));
+
+blink(I==potential_blink)=double(feature);
+
 %----------------------------EMG artifact estimation-----------------------
 
 comp_count_eeg = 1;
@@ -110,6 +137,9 @@ for k = 1:size(EEG.icawinv,2)
     elseif ~isfield(EEG,'comptype') && kurt(k)
         type = label{5};
         comptype(I(k))=5;
+    elseif ~isfield(EEG,'comptype') && blink(k)
+        type = label{2};
+        comptype(I(k))=2;
     else
         type = '';
     end
