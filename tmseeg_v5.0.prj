@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="1855815977" file="C:\Users\bjmsc\Documents\MATLAB\tmseeg_v50\tmseeg_v5.0.prj" location="C:\Users\bjmsc\Documents\MATLAB\tmseeg_v50" name="tmseeg_v5.0" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="2985820945" file="C:\Users\bjmsc\Documents\MATLAB\Toolboxes\tmseeg_v50\tmseeg_v5.0.prj" location="C:\Users\bjmsc\Documents\MATLAB\Toolboxes\tmseeg_v50" name="tmseeg_v5.0" target="target.mlapps" target-name="Package App">
     <param.appname>tmseeg_v5.0</param.appname>
     <param.authnamewatermark />
     <param.email />
@@ -82,7 +82,7 @@
     </fileset.resources>
     <fileset.package />
     <build-deliverables>
-      <file location="C:\Users\bjmsc\Documents\MATLAB" name="tmseeg_v50" optional="false">C:\Users\bjmsc\Documents\MATLAB\tmseeg_v50</file>
+      <file location="C:\Users\bjmsc\Documents\MATLAB\Toolboxes" name="tmseeg_v50" optional="false">C:\Users\bjmsc\Documents\MATLAB\Toolboxes\tmseeg_v50</file>
     </build-deliverables>
     <workflow />
     <matlab>
